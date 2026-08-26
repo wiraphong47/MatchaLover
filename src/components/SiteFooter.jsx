@@ -1,9 +1,2 @@
-export default function SiteFooter() {
-  return (
-    <footer>
-      <span>© 2026 MATCHA MORI</span>
-      <span>มัทฉะแท้ คุณภาพพรีเมียม</span>
-      <span>INSTAGRAM &nbsp; LINE</span>
-    </footer>
-  );
-}
+import { Box, Stack, Typography } from '@mui/material'
+export default function SiteFooter() { return <Box component="footer" sx={{ bgcolor: '#183b2a', color: '#f2ead8', px: { xs: 3, md: '8vw' }, py: { xs: 3, md: 0 }, minHeight: 72, display: 'flex', alignItems: 'center' }}><Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={{ xs: 1, md: 0 }} width="100%"><Typography sx={{ fontSize: 13, letterSpacing: '.12em' }}>© 2026 MATCHA MORI</Typography><Typography sx={{ fontSize: 13, letterSpacing: '.12em' }}>มัทฉะแท้ คุณภาพพรีเมียม</Typography><Typography sx={{ fontSize: 13, letterSpacing: '.12em' }}>INSTAGRAM &nbsp; LINE</Typography></Stack></Box> }
