@@ -1,7 +1,7 @@
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import { assetUrl } from "../utils/assets";
 
-export default function ProductCard({ product, onView }) {
+export default function ProductCard({ product, onView, onAdd }) {
   return (
     <Box
       component="article"
@@ -104,6 +104,15 @@ export default function ProductCard({ product, onView }) {
           }}
         >
           ดูรายละเอียด&nbsp; →
+        </Button>
+        <Button
+          onClick={() => onAdd(product)}
+          variant="contained"
+          disableElevation
+          fullWidth
+          sx={{ mt: 1, bgcolor: "#183b2a", fontSize: 16, "&:hover": { bgcolor: "#28573f" } }}
+        >
+          เพิ่มลงตะกร้า
         </Button>
       </Box>
     </Box>

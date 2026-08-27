@@ -1,0 +1,62 @@
+export const packages = [
+  {
+    name: "Daily Matcha Set",
+    subtitle: "ชุดเริ่มต้นสำหรับทุกวัน",
+    price: "1,290",
+    originalPrice: "1,550",
+    image: "Daily Matcha Set.jpg",
+    description: "เริ่มพิธีชงมัทฉะที่บ้านได้อย่างง่ายดาย สำหรับลาเต้และเมนูประจำวัน",
+    items: [
+      { name: "Premium Blend 100g", price: 390 },
+      { name: "แปรงตีชาไม้ไผ่", price: 390 },
+      { name: "แท่นวางแปรง", price: 290 },
+      { name: "ช้อนตักชาไม้ไผ่", price: 190 },
+      { name: "ตะแกรงร่อนมัทฉะขนาดเล็ก", price: 290 },
+      { name: "การ์ดสูตรชงชา", price: 0 },
+    ],
+  },
+  {
+    name: "Ceremony Gift Set",
+    subtitle: "ชุดของขวัญพรีเมียม",
+    price: "2,690",
+    originalPrice: "3,200",
+    image: "Ceremony Gift Set.jpg",
+    description: "ชุดของขวัญสำหรับผู้หลงใหลในรสอูมามิและช่วงเวลาชงชาที่ละเมียดละไม",
+    items: [
+      { name: "Ceremonial Grade 30g", price: 590 },
+      { name: "ถ้วยชงชามัทฉะ", price: 590 },
+      { name: "แปรงชงชาไม้ไผ่", price: 390 },
+      { name: "แท่นวางแปรงชงชา", price: 290 },
+      { name: "ช้อนตักชาไม้ไผ่", price: 190 },
+      { name: "กระปุกใส่ผงชา", price: 250 },
+      { name: "ตะแกรงร่อนมัทฉะ", price: 290 },
+      { name: "ผ้าเช็ดอุปกรณ์", price: 120 },
+      { name: "ถาดรองไม้", price: 450 },
+      { name: "กล่องบรรจุภัณฑ์", price: 40 },
+    ],
+  },
+  {
+    name: "Home Tea Ritual Set",
+    subtitle: "ชุดอุปกรณ์ชงครบชุด",
+    price: "1,990",
+    originalPrice: "2,340",
+    image: "Home Tea Ritual Set.webp",
+    description: "จัดทุกสิ่งที่ต้องมีสำหรับทำมัทฉะให้เป็นกิจวัตรโปรดที่บ้าน",
+    items: [
+      { name: "Ceremonial Grade 30g", price: 590 },
+      { name: "ตะแกรงร่อนมัทฉะ", price: 290 },
+      { name: "ถ้วยชงชามัทฉะ", price: 590 },
+      { name: "แท่นวางแปรงชงชา", price: 290 },
+      { name: "ช้อนตักชาไม้ไผ่", price: 190 },
+      { name: "แปรงชงชาไม้ไผ่", price: 390 },
+    ],
+  },
+];
+
+export const brewTools = [
+  { name: "ถ้วยชงชามัทฉะ", subtitle: "Chawan ทรงคลาสสิก", price: "590", image: "ถ้วยชงชา.jpg", description: "ถ้วยชงทรงพอดีมือ ช่วยให้ตีชาและดื่มได้อย่างสะดวก" },
+  { name: "Chashaku ไม้ไผ่", subtitle: "ช้อนตักมัทฉะแบบญี่ปุ่น", price: "190", image: "Chasen ไม้ไผ่.jpg", description: "ช้อนตักผงมัทฉะขนาดพอดี ช่วยให้กะปริมาณสำหรับหนึ่งแก้วได้ง่าย" },
+  { name: "ช้อนตักชาไม้ไผ่", subtitle: "เก็บทรงแปรงตีให้สวยงาม", price: "350", image: "ช้อนตักชาไม้ไผ่.jpg", description: "ช่วยรักษารูปทรงของแปรงตีหลังใช้งาน ให้พร้อมสำหรับการชงครั้งต่อไป" },
+  { name: "ตะแกรงร่อนมัทฉะ", subtitle: "ผงเนียนละเอียดก่อนชง", price: "290", image: "ตะแกรงร่อนชา.jpg", description: "ร่อนผงก่อนชงเพื่อให้ละลายง่าย ตีเนียน และลดการจับตัวเป็นก้อน" },
+  { name: "แท่นวางแปรงชงชา", subtitle: "ผงเนียนละเอียดก่อนชง", price: "290", image: "แท่นวางแปรงชงชา.jpg", description: "ร่อนผงก่อนชงเพื่อให้ละลายง่าย ตีเนียน และลดการจับตัวเป็นก้อน" },
+];

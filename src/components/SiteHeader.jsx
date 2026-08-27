@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { assetUrl } from "../utils/assets";
 
-export default function SiteHeader({ onHome }) {
+export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onOpenCart, onOpenAccount, customer }) {
   const navSx = {
     color: "#183b2a",
     fontSize: { xs: 0, md: 17 },
@@ -88,13 +88,20 @@ export default function SiteHeader({ onHome }) {
             direction="row"
             sx={{ flex: 1, justifyContent: "center", gap: 1 }}
           >
-            <Button href="#top" sx={navSx}>
+            <Button
+              href="#top"
+              onClick={(event) => {
+                event.preventDefault();
+                onHome?.();
+              }}
+              sx={navSx}
+            >
               หน้าหลัก
             </Button>
-            <Button href="#products" sx={navSx}>
+            <Button href="#products" onClick={(event) => { event.preventDefault(); onProducts?.(); }} sx={navSx}>
               สินค้าของเรา
             </Button>
-            <Button href="#story" sx={navSx}>
+            <Button href="#story" onClick={(event) => { event.preventDefault(); onStory?.(); }} sx={navSx}>
               เรื่องราวของเรา
             </Button>
           </Stack>
@@ -105,7 +112,11 @@ export default function SiteHeader({ onHome }) {
               justifyContent: "flex-end",
             }}
           >
+            <Button onClick={onOpenAccount} sx={{ display: { xs: "none", md: "inline-flex" }, color: "#183b2a", mr: 1, fontSize: 16 }}>
+              {customer ? "บัญชีของฉัน" : "สมัครสมาชิก"}
+            </Button>
             <Button
+              onClick={onOpenCart}
               variant="outlined"
               sx={{
                 borderColor: "#183b2a",
@@ -117,7 +128,7 @@ export default function SiteHeader({ onHome }) {
             >
               ตะกร้าสินค้า{" "}
               <Chip
-                label="0"
+                label={cartCount}
                 size="small"
                 sx={{
                   ml: 1,

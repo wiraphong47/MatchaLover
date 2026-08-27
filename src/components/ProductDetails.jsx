@@ -1,6 +1,6 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { assetUrl } from "../utils/assets";
-export default function ProductDetails({ product, onBack }) {
+export default function ProductDetails({ product, onBack, onAdd, recommendation }) {
   return (
     <Box
       component="main"
@@ -112,6 +112,7 @@ export default function ProductDetails({ product, onBack }) {
               ฿{product.price}
             </Typography>
             <Button
+              onClick={() => onAdd(product)}
               variant="contained"
               disableElevation
               sx={{
@@ -124,6 +125,13 @@ export default function ProductDetails({ product, onBack }) {
               เพิ่มลงตะกร้า →
             </Button>
           </Stack>
+          {recommendation && (
+            <Box sx={{ mt: 4, p: 2.2, bgcolor: "#eef1df", borderLeft: "3px solid #a8874b" }}>
+              <Typography sx={{ color: "#6c815e", fontSize: 12, fontWeight: 700, letterSpacing: ".12em" }}>แนะนำให้ลองต่อ</Typography>
+              <Typography sx={{ mt: .4, fontSize: 18, fontWeight: 700 }}>{recommendation.name}</Typography>
+              <Typography sx={{ color: "#536154", fontSize: 15, mt: .4 }}>{recommendation.use} · ฿{recommendation.price}</Typography>
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>
