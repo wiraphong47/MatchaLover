@@ -28,11 +28,8 @@ export default function GradeGuide({ products }) {
           variant="h3"
           sx={{ fontSize: { xs: 34, md: 39 }, lineHeight: 1.15, mt: 1 }}
         >
-          3 เกรดต่างกัน
+          แต่ละอันแตกต่างกันอย่างไร? <br />
           <br />
-          <Box component="em" sx={{ color: "#d9e683", fontStyle: "normal" }}>
-            อย่างไร?
-          </Box>
         </Typography>
       </Box>
       <Box

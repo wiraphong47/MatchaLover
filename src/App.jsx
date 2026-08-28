@@ -23,43 +23,129 @@ import { assetUrl } from "./utils/assets";
 
 export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem("matcha-mori-cart") || "[]"));
-  const [customer, setCustomer] = useState(() => JSON.parse(localStorage.getItem("matcha-mori-customer") || "null"));
-  const [orders, setOrders] = useState(() => JSON.parse(localStorage.getItem("matcha-mori-orders") || "[]"));
+  const [cart, setCart] = useState(() =>
+    JSON.parse(localStorage.getItem("matcha-mori-cart") || "[]"),
+  );
+  const [customer, setCustomer] = useState(() =>
+    JSON.parse(localStorage.getItem("matcha-mori-customer") || "null"),
+  );
+  const [orders, setOrders] = useState(() =>
+    JSON.parse(localStorage.getItem("matcha-mori-orders") || "[]"),
+  );
   const [cartOpen, setCartOpen] = useState(false);
   const [customerOpen, setCustomerOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [pendingCheckout, setPendingCheckout] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [category, setCategory] = useState("all");
   const [query, setQuery] = useState("");
-  useEffect(() => localStorage.setItem("matcha-mori-cart", JSON.stringify(cart)), [cart]);
-  useEffect(() => localStorage.setItem("matcha-mori-customer", JSON.stringify(customer)), [customer]);
-  useEffect(() => localStorage.setItem("matcha-mori-orders", JSON.stringify(orders)), [orders]);
+  useEffect(
+    () => localStorage.setItem("matcha-mori-cart", JSON.stringify(cart)),
+    [cart],
+  );
+  useEffect(
+    () =>
+      localStorage.setItem("matcha-mori-customer", JSON.stringify(customer)),
+    [customer],
+  );
+  useEffect(
+    () => localStorage.setItem("matcha-mori-orders", JSON.stringify(orders)),
+    [orders],
+  );
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const couponApplied = couponCode.trim().toUpperCase() === "MATCHA12";
-  const matchesSearch = (item) => `${item.name} ${item.subtitle || ""} ${item.thai || ""} ${item.use || ""} ${item.description || ""}`.toLowerCase().includes(query.trim().toLowerCase());
+  const matchesSearch = (item) =>
+    JSON.stringify(item).toLowerCase().includes(query.trim().toLowerCase());
   const filteredProducts = products.filter(matchesSearch);
   const filteredPackages = packages.filter(matchesSearch);
   const filteredTools = brewTools.filter(matchesSearch);
   const addToCart = (product) => {
-    setCart((current) => current.some((item) => item.name === product.name)
-      ? current.map((item) => item.name === product.name ? { ...item, quantity: item.quantity + 1 } : item)
-      : [...current, { ...product, quantity: 1 }]);
+    setCart((current) =>
+      current.some((item) => item.name === product.name)
+        ? current.map((item) =>
+            item.name === product.name
+              ? { ...item, quantity: item.quantity + 1 }
+              : item,
+          )
+        : [...current, { ...product, quantity: 1 }],
+    );
     setCartOpen(true);
   };
-  const changeQuantity = (name, amount) => setCart((current) => current.map((item) => item.name === name ? { ...item, quantity: item.quantity + amount } : item).filter((item) => item.quantity > 0));
-  const saveCustomer = (profile) => setCustomer(profile);
+  const buyNow = (product) => {
+    const nextCart = cart.some((item) => item.name === product.name)
+      ? cart.map((item) =>
+          item.name === product.name
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
+        )
+      : [...cart, { ...product, quantity: 1 }];
+    setCart(nextCart);
+    if (!customer) {
+      setPendingCheckout(true);
+      setCustomerOpen(true);
+      return;
+    }
+    setSelectedProduct(null);
+    setCheckoutOpen(true);
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
+  };
+  const openProduct = (product) => {
+    setSelectedProduct(product);
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
+  };
+  const changeQuantity = (name, amount) =>
+    setCart((current) =>
+      current
+        .map((item) =>
+          item.name === name
+            ? { ...item, quantity: item.quantity + amount }
+            : item,
+        )
+        .filter((item) => item.quantity > 0),
+    );
+  const saveCustomer = (profile) => {
+    setCustomer(profile);
+    if (pendingCheckout) {
+      setPendingCheckout(false);
+      setSelectedProduct(null);
+      setCheckoutOpen(true);
+      window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
+    }
+  };
   const startCheckout = () => {
-    if (!customer) { setCartOpen(false); setCustomerOpen(true); return; }
-    setCartOpen(false); setCheckoutOpen(true);
+    if (!customer) {
+      setCartOpen(false);
+      setCustomerOpen(true);
+      return;
+    }
+    setCartOpen(false);
+    setCheckoutOpen(true);
   };
   const confirmCheckout = ({ total, discount, method, slipName }) => {
-    setOrders((current) => [{ id: `MM${Date.now().toString().slice(-6)}`, total, discount, method, slipName, coupon: couponApplied ? "MATCHA12" : null, items: cart, createdAt: new Date().toLocaleDateString("th-TH") }, ...current]);
-    setCart([]); setCouponCode(""); setCartOpen(false); setAccountOpen(true);
+    setOrders((current) => [
+      {
+        id: `MM${Date.now().toString().slice(-6)}`,
+        total,
+        discount,
+        method,
+        slipName,
+        coupon: couponApplied ? "MATCHA12" : null,
+        items: cart,
+        createdAt: new Date().toLocaleDateString("th-TH"),
+      },
+      ...current,
+    ]);
+    setCart([]);
+    setCouponCode("");
+    setCartOpen(false);
+    setAccountOpen(true);
     setCheckoutOpen(false);
   };
-  const logout = () => { setCustomer(null); setAccountOpen(false); };
+  const logout = () => {
+    setCustomer(null);
+    setAccountOpen(false);
+  };
   const scrollToProducts = () =>
     document.querySelector("#products")?.scrollIntoView({ behavior: "smooth" });
   const returnToProducts = () => {
@@ -80,24 +166,129 @@ export default function App() {
   const navigateToSection = (selector) => {
     setSelectedProduct(null);
     setCheckoutOpen(false);
-    window.setTimeout(() => document.querySelector(selector)?.scrollIntoView({ behavior: "smooth" }), 0);
+    window.setTimeout(
+      () =>
+        document
+          .querySelector(selector)
+          ?.scrollIntoView({ behavior: "smooth" }),
+      0,
+    );
   };
   if (checkoutOpen)
-    return <><SiteHeader onHome={returnHome} onProducts={() => navigateToSection("#products")} onStory={() => navigateToSection("#story")} cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onOpenAccount={() => customer ? setAccountOpen(true) : setCustomerOpen(true)} customer={customer} /><CheckoutPage cart={cart} customer={customer} couponApplied={couponApplied} onBack={() => { setCheckoutOpen(false); setCartOpen(true); }} onConfirm={confirmCheckout} /><SiteFooter /><CustomerDialog open={customerOpen} onClose={() => setCustomerOpen(false)} customer={customer} onSave={saveCustomer} /><AccountPanel open={accountOpen} onClose={() => setAccountOpen(false)} customer={customer} orders={orders} onEdit={() => { setAccountOpen(false); setCustomerOpen(true); }} onLogout={logout} /></>;
+    return (
+      <>
+        <SiteHeader
+          onHome={returnHome}
+          onProducts={() => navigateToSection("#products")}
+          onStory={() => navigateToSection("#story")}
+          cartCount={cartCount}
+          onOpenCart={() => setCartOpen(true)}
+          onOpenAccount={() =>
+            customer ? setAccountOpen(true) : setCustomerOpen(true)
+          }
+          customer={customer}
+        />
+        <CheckoutPage
+          cart={cart}
+          customer={customer}
+          couponApplied={couponApplied}
+          onBack={() => {
+            setCheckoutOpen(false);
+            setCartOpen(true);
+          }}
+          onConfirm={confirmCheckout}
+        />
+        <SiteFooter />
+        <CustomerDialog
+          open={customerOpen}
+          onClose={() => setCustomerOpen(false)}
+          customer={customer}
+          onSave={saveCustomer}
+        />
+        <AccountPanel
+          open={accountOpen}
+          onClose={() => setAccountOpen(false)}
+          customer={customer}
+          orders={orders}
+          onEdit={() => {
+            setAccountOpen(false);
+            setCustomerOpen(true);
+          }}
+          onLogout={logout}
+        />
+      </>
+    );
   if (selectedProduct)
     return (
       <>
-        <SiteHeader onHome={returnHome} onProducts={() => navigateToSection("#products")} onStory={() => navigateToSection("#story")} cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onOpenAccount={() => customer ? setAccountOpen(true) : setCustomerOpen(true)} customer={customer} />
-        <ProductDetails product={selectedProduct} onBack={returnToProducts} onAdd={addToCart} recommendation={products.find((item) => item.name !== selectedProduct.name)} />
+        <SiteHeader
+          onHome={returnHome}
+          onProducts={() => navigateToSection("#products")}
+          onStory={() => navigateToSection("#story")}
+          cartCount={cartCount}
+          onOpenCart={() => setCartOpen(true)}
+          onOpenAccount={() =>
+            customer ? setAccountOpen(true) : setCustomerOpen(true)
+          }
+          customer={customer}
+        />
+        <ProductDetails
+          product={selectedProduct}
+          onBack={returnToProducts}
+          onAdd={addToCart}
+          onBuyNow={buyNow}
+          recommendation={products.find(
+            (item) => item.name !== selectedProduct.name,
+          )}
+        />
         <SiteFooter />
-        <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} cart={cart} onChangeQuantity={changeQuantity} onCheckout={startCheckout} customer={customer} onOpenAccount={() => { setCartOpen(false); setCustomerOpen(true); }} couponCode={couponCode} onCouponChange={setCouponCode} couponApplied={couponApplied} />
-        <CustomerDialog open={customerOpen} onClose={() => setCustomerOpen(false)} customer={customer} onSave={saveCustomer} />
-        <AccountPanel open={accountOpen} onClose={() => setAccountOpen(false)} customer={customer} orders={orders} onEdit={() => { setAccountOpen(false); setCustomerOpen(true); }} onLogout={logout} />
+        <CartDrawer
+          open={cartOpen}
+          onClose={() => setCartOpen(false)}
+          cart={cart}
+          onChangeQuantity={changeQuantity}
+          onCheckout={startCheckout}
+          customer={customer}
+          onOpenAccount={() => {
+            setCartOpen(false);
+            setCustomerOpen(true);
+          }}
+          couponCode={couponCode}
+          onCouponChange={setCouponCode}
+          couponApplied={couponApplied}
+        />
+        <CustomerDialog
+          open={customerOpen}
+          onClose={() => setCustomerOpen(false)}
+          customer={customer}
+          onSave={saveCustomer}
+        />
+        <AccountPanel
+          open={accountOpen}
+          onClose={() => setAccountOpen(false)}
+          customer={customer}
+          orders={orders}
+          onEdit={() => {
+            setAccountOpen(false);
+            setCustomerOpen(true);
+          }}
+          onLogout={logout}
+        />
       </>
     );
   return (
     <>
-      <SiteHeader onHome={returnHome} onProducts={() => navigateToSection("#products")} onStory={() => navigateToSection("#story")} cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onOpenAccount={() => customer ? setAccountOpen(true) : setCustomerOpen(true)} customer={customer} />
+      <SiteHeader
+        onHome={returnHome}
+        onProducts={() => navigateToSection("#products")}
+        onStory={() => navigateToSection("#story")}
+        cartCount={cartCount}
+        onOpenCart={() => setCartOpen(true)}
+        onOpenAccount={() =>
+          customer ? setAccountOpen(true) : setCustomerOpen(true)
+        }
+        customer={customer}
+      />
       <Box component="main">
         <Hero onShopClick={scrollToProducts} />
         <Box
@@ -123,7 +314,15 @@ export default function App() {
           >
             THE MATCHA MORI PHILOSOPHY
           </Typography>
-          <Typography variant="h2" sx={{ fontSize: { xs: 40, md: 52 }, mt: 2 }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontSize: { xs: 40, md: 52 },
+              mt: 2,
+              fontFamily: '"Noto Sans Thai", sans-serif',
+              fontWeight: 700,
+            }}
+          >
             มัทฉะแท้{" "}
             <Box
               component="em"
@@ -232,28 +431,59 @@ export default function App() {
               ดูสินค้าทั้งหมด →
             </Button>
           </Stack>
-          <CatalogControls category={category} onCategoryChange={setCategory} query={query} onQueryChange={setQuery} />
-          {(category === "all" || category === "matcha") && <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "repeat(3,1fr)" },
-              gap: 2.5,
-            }}
-          >
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.name}
-                product={product}
-                onView={setSelectedProduct}
+          <CatalogControls
+            category={category}
+            onCategoryChange={setCategory}
+            query={query}
+            onQueryChange={setQuery}
+          />
+          {(category === "all" || category === "matcha") && (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "repeat(3,1fr)" },
+                gap: 2.5,
+              }}
+            >
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.name}
+                  product={product}
+                  onView={openProduct}
+                  onAdd={addToCart}
+                />
+              ))}
+            </Box>
+          )}
+          {!query.trim() && (category === "all" || category === "matcha") && (
+            <>
+              <RecommendationQuiz
+                products={products}
                 onAdd={addToCart}
+                onView={openProduct}
               />
-            ))}
-          </Box>}
-          {!query.trim() && (category === "all" || category === "matcha") && <><RecommendationQuiz products={products} onAdd={addToCart} onView={setSelectedProduct} /><GradeGuide products={products} /></>}
+              <GradeGuide products={products} />
+            </>
+          )}
         </Box>
-        {(category === "all" || category === "package") && filteredPackages.length > 0 && <PackageCollection packages={filteredPackages} onAdd={addToCart} />}
-        {(category === "all" || category === "tools") && filteredTools.length > 0 && <BrewTools tools={filteredTools} onAdd={addToCart} />}
-        {!query.trim() && <><Reviews /><Faq /></>}
+        {(category === "all" || category === "package") &&
+          filteredPackages.length > 0 && (
+            <PackageCollection
+              packages={filteredPackages}
+              products={products}
+              onAdd={addToCart}
+            />
+          )}
+        {(category === "all" || category === "tools") &&
+          filteredTools.length > 0 && (
+            <BrewTools tools={filteredTools} onAdd={addToCart} />
+          )}
+        {!query.trim() && (
+          <>
+            <Reviews />
+            <Faq />
+          </>
+        )}
         <Box
           component="section"
           sx={{
@@ -329,9 +559,38 @@ export default function App() {
         </Box>
       </Box>
       <SiteFooter />
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} cart={cart} onChangeQuantity={changeQuantity} onCheckout={startCheckout} customer={customer} onOpenAccount={() => { setCartOpen(false); setCustomerOpen(true); }} couponCode={couponCode} onCouponChange={setCouponCode} couponApplied={couponApplied} />
-      <CustomerDialog open={customerOpen} onClose={() => setCustomerOpen(false)} customer={customer} onSave={saveCustomer} />
-      <AccountPanel open={accountOpen} onClose={() => setAccountOpen(false)} customer={customer} orders={orders} onEdit={() => { setAccountOpen(false); setCustomerOpen(true); }} onLogout={logout} />
+      <CartDrawer
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        cart={cart}
+        onChangeQuantity={changeQuantity}
+        onCheckout={startCheckout}
+        customer={customer}
+        onOpenAccount={() => {
+          setCartOpen(false);
+          setCustomerOpen(true);
+        }}
+        couponCode={couponCode}
+        onCouponChange={setCouponCode}
+        couponApplied={couponApplied}
+      />
+      <CustomerDialog
+        open={customerOpen}
+        onClose={() => setCustomerOpen(false)}
+        customer={customer}
+        onSave={saveCustomer}
+      />
+      <AccountPanel
+        open={accountOpen}
+        onClose={() => setAccountOpen(false)}
+        customer={customer}
+        orders={orders}
+        onEdit={() => {
+          setAccountOpen(false);
+          setCustomerOpen(true);
+        }}
+        onLogout={logout}
+      />
     </>
   );
 }

@@ -1,11 +1,11 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { assetUrl } from "../utils/assets";
-export default function ProductDetails({ product, onBack, onAdd, recommendation }) {
+export default function ProductDetails({ product, onBack, onAdd, onBuyNow, recommendation }) {
   return (
     <Box
       component="main"
       sx={{
-        p: { xs: "35px 20px 65px", md: "70px 10vw 110px" },
+        p: { xs: "28px 20px 65px", md: "48px 10vw 88px" },
         minHeight: 620,
         bgcolor: "#eee9dd",
       }}
@@ -27,10 +27,11 @@ export default function ProductDetails({ product, onBack, onAdd, recommendation 
         sx={{
           maxWidth: 1060,
           mx: "auto",
-          mt: 4,
+          mt: 3,
           display: "grid",
           gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
           bgcolor: "#fffdf9",
+          boxShadow: "0 18px 50px rgba(31,52,37,.08)",
         }}
       >
         <Box
@@ -39,11 +40,11 @@ export default function ProductDetails({ product, onBack, onAdd, recommendation 
           alt={`${product.name} ผงมัทฉะ`}
           sx={{
             width: "100%",
-            height: { xs: 300, md: 510 },
+            height: { xs: 320, md: 530 },
             objectFit: "cover",
           }}
         />
-        <Box sx={{ p: { xs: 3.5, md: "70px 62px" } }}>
+        <Box sx={{ p: { xs: 3.5, md: "52px 58px" } }}>
           <Typography
             sx={{
               color: "#79856a",
@@ -77,6 +78,7 @@ export default function ProductDetails({ product, onBack, onAdd, recommendation 
             {[
               ["รสสัมผัส", product.note],
               ["เหมาะสำหรับ", product.use],
+              ...(product.aroma ? [["กลิ่น", product.aroma], ["รส", product.taste], ["สำหรับคนไทย", product.thaiPreference], ["แหล่งปลูก", product.origin]] : []),
             ].map(([label, value], index) => (
               <Stack
                 key={label}
@@ -84,7 +86,7 @@ export default function ProductDetails({ product, onBack, onAdd, recommendation 
                 sx={{
                   py: 1.8,
                   gap: 2,
-                  borderBottom: index === 0 ? "1px solid #dcd3c2" : 0,
+                  borderBottom: "1px solid #dcd3c2",
                 }}
               >
                 <Typography sx={{ width: 115, fontSize: 15, color: "#788272" }}>
@@ -97,7 +99,7 @@ export default function ProductDetails({ product, onBack, onAdd, recommendation 
             ))}
           </Box>
           <Stack
-            direction="row"
+            direction={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
             alignItems="center"
             gap={2}
@@ -111,19 +113,10 @@ export default function ProductDetails({ product, onBack, onAdd, recommendation 
             >
               ฿{product.price}
             </Typography>
-            <Button
-              onClick={() => onAdd(product)}
-              variant="contained"
-              disableElevation
-              sx={{
-                bgcolor: "#efe2bd",
-                color: "#183b2a",
-                fontSize: 16,
-                "&:hover": { bgcolor: "#e5d5ab" },
-              }}
-            >
-              เพิ่มลงตะกร้า →
-            </Button>
+            <Stack direction="row" spacing={1}>
+              <Button onClick={() => onAdd(product)} variant="outlined" sx={{ borderColor: "#183b2a", color: "#183b2a", fontSize: 16 }}>เพิ่มตะกร้า</Button>
+              <Button onClick={() => onBuyNow(product)} variant="contained" disableElevation sx={{ bgcolor: "#183b2a", fontSize: 16, "&:hover": { bgcolor: "#28573f" } }}>ชำระเงินเลย</Button>
+            </Stack>
           </Stack>
           {recommendation && (
             <Box sx={{ mt: 4, p: 2.2, bgcolor: "#eef1df", borderLeft: "3px solid #a8874b" }}>

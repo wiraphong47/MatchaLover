@@ -5,15 +5,30 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  MenuItem,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { assetUrl } from "../utils/assets";
 
-export default function PackageCollection({ packages, onAdd }) {
+const priceOf = (price) => Number(String(price).replace(/,/g, ""));
+const formatPrice = (price) => price.toLocaleString("en-US");
+const packPricing = (pack, matcha) => {
+  const original = pack.accessoryPrice + priceOf(matcha.price);
+  const price = Math.round((original * (1 - pack.discountRate)) / 10) * 10;
+  return { original, price };
+};
+
+export default function PackageCollection({ packages, products, onAdd }) {
   const [selected, setSelected] = useState(null);
+  const [selectedMatcha, setSelectedMatcha] = useState(null);
   const [imageOpen, setImageOpen] = useState(false);
+  const openPackage = (pack) => {
+    setSelected(pack);
+    setSelectedMatcha(products.find((product) => product.name === pack.defaultMatcha) || products[0]);
+  };
   return (
     <>
       <Box
@@ -102,7 +117,7 @@ export default function PackageCollection({ packages, onAdd }) {
                     </Typography>
                   </Box>
                   <Button
-                    onClick={() => setSelected(pack)}
+                    onClick={() => openPackage(pack)}
                     sx={{ color: "#183b2a" }}
                   >
                     ดูในแพ็ก →
@@ -123,7 +138,7 @@ export default function PackageCollection({ packages, onAdd }) {
           {selected?.name}
         </DialogTitle>
         <DialogContent>
-          {selected && (
+          {selected && selectedMatcha && (
             <>
               <Button
                 onClick={() => setImageOpen(true)}
@@ -140,26 +155,42 @@ export default function PackageCollection({ packages, onAdd }) {
               <Typography sx={{ color: "#607159", fontSize: 17 }}>
                 {selected.description}
               </Typography>
+              <TextField
+                select
+                fullWidth
+                label="เลือกมัทฉะในแพ็ก"
+                value={selectedMatcha.name}
+                onChange={(event) => setSelectedMatcha(products.find((product) => product.name === event.target.value))}
+                sx={{ mt: 2.5 }}
+              >
+                {products.map((product) => <MenuItem key={product.name} value={product.name}>{product.name} · {product.size} · ฿{product.price}</MenuItem>)}
+              </TextField>
+              <Typography sx={{ color: "#547d3b", fontSize: 14, mt: 1 }}>
+                ราคาชุดจะปรับตามมัทฉะที่เลือก โดยยังคงส่วนลดแพ็กเกจ
+              </Typography>
               <Typography sx={{ mt: 2.5, fontWeight: 700, fontSize: 18 }}>
                 ภายในแพ็กประกอบด้วย
               </Typography>
               <Stack component="ul" spacing={0.7} sx={{ pl: 2.5, mt: 1 }}>
-                {selected.items.map((item) => (
+                {selected.items.map((item) => {
+                  const listedItem = item.isMatcha ? { ...selectedMatcha, price: priceOf(selectedMatcha.price) } : item;
+                  return (
                   <Stack component="li" key={item.name} direction="row" justifyContent="space-between" sx={{ color: "#415444", pr: 1 }}>
-                    <Typography component="span">{item.name}</Typography>
-                    <Typography component="span" sx={{ color: "#71806a" }}>{item.price ? `฿${item.price}` : "ของแถม"}</Typography>
+                    <Typography component="span">{listedItem.name}</Typography>
+                    <Typography component="span" sx={{ color: "#71806a" }}>{listedItem.price ? `฿${formatPrice(priceOf(listedItem.price))}` : "ของแถม"}</Typography>
                   </Stack>
-                ))}
+                  );
+                })}
               </Stack>
               <Stack direction="row" spacing={1.25} alignItems="baseline" sx={{ mt: 2.5 }}>
                 <Typography sx={{ color: "#8b8b81", textDecoration: "line-through" }}>
-                  ฿{selected.originalPrice}
+                  ฿{formatPrice(packPricing(selected, selectedMatcha).original)}
                 </Typography>
                 <Typography sx={{ color: "#a8874b", fontSize: 25, fontWeight: 700 }}>
-                  ฿{selected.price}
+                  ฿{formatPrice(packPricing(selected, selectedMatcha).price)}
                 </Typography>
                 <Typography sx={{ color: "#547d3b", fontSize: 14 }}>
-                  ประหยัด ฿{Number(selected.originalPrice.replace(/,/g, "")) - Number(selected.price.replace(/,/g, ""))}
+                  ประหยัด ฿{formatPrice(packPricing(selected, selectedMatcha).original - packPricing(selected, selectedMatcha).price)}
                 </Typography>
               </Stack>
             </>
@@ -171,7 +202,8 @@ export default function PackageCollection({ packages, onAdd }) {
           </Button>
           <Button
             onClick={() => {
-              onAdd({ ...selected, size: "Gift set" });
+              const pricing = packPricing(selected, selectedMatcha);
+              onAdd({ ...selected, name: `${selected.name} · ${selectedMatcha.name}`, price: formatPrice(pricing.price), size: "Gift set", selectedMatcha: selectedMatcha.name });
               setSelected(null);
             }}
             variant="contained"
