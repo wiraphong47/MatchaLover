@@ -1,5 +1,5 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SiteHeader from "./components/SiteHeader";
 import Hero from "./components/Hero";
 import ProductCard from "./components/ProductCard";
@@ -20,68 +20,38 @@ import Faq from "./components/Faq";
 import { products } from "./data/products";
 import { brewTools, packages } from "./data/collections";
 import { assetUrl } from "./utils/assets";
+import useShop from "./hooks/useShop";
 
 export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [cart, setCart] = useState(() =>
-    JSON.parse(localStorage.getItem("matcha-mori-cart") || "[]"),
-  );
-  const [customer, setCustomer] = useState(() =>
-    JSON.parse(localStorage.getItem("matcha-mori-customer") || "null"),
-  );
-  const [orders, setOrders] = useState(() =>
-    JSON.parse(localStorage.getItem("matcha-mori-orders") || "[]"),
-  );
+  const shop = useShop();
   const [cartOpen, setCartOpen] = useState(false);
   const [customerOpen, setCustomerOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
-  const [couponCode, setCouponCode] = useState("");
+  const {
+    addToCart,
+    cart,
+    cartCount,
+    changeQuantity,
+    couponApplied,
+    couponCode,
+    customer,
+    orders,
+    setCouponCode,
+    setCustomer,
+  } = shop;
   const [category, setCategory] = useState("all");
   const [query, setQuery] = useState("");
-  useEffect(
-    () => localStorage.setItem("matcha-mori-cart", JSON.stringify(cart)),
-    [cart],
-  );
-  useEffect(
-    () =>
-      localStorage.setItem("matcha-mori-customer", JSON.stringify(customer)),
-    [customer],
-  );
-  useEffect(
-    () => localStorage.setItem("matcha-mori-orders", JSON.stringify(orders)),
-    [orders],
-  );
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const couponApplied = couponCode.trim().toUpperCase() === "MATCHA12";
   const matchesSearch = (item) =>
     JSON.stringify(item).toLowerCase().includes(query.trim().toLowerCase());
   const filteredProducts = products.filter(matchesSearch);
   const filteredPackages = packages.filter(matchesSearch);
   const filteredTools = brewTools.filter(matchesSearch);
-  const addToCart = (product) => {
-    setCart((current) =>
-      current.some((item) => item.name === product.name)
-        ? current.map((item) =>
-            item.name === product.name
-              ? { ...item, quantity: item.quantity + 1 }
-              : item,
-          )
-        : [...current, { ...product, quantity: 1 }],
-    );
-    setCartOpen(true);
-  };
   const buyNow = (product) => {
-    const nextCart = cart.some((item) => item.name === product.name)
-      ? cart.map((item) =>
-          item.name === product.name
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
-        )
-      : [...cart, { ...product, quantity: 1 }];
-    setCart(nextCart);
-    if (!customer) {
+    shop.setCart(shop.addProductToCart(product));
+    if (!shop.customer) {
       setPendingCheckout(true);
       setCustomerOpen(true);
       return;
@@ -94,18 +64,8 @@ export default function App() {
     setSelectedProduct(product);
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
   };
-  const changeQuantity = (name, amount) =>
-    setCart((current) =>
-      current
-        .map((item) =>
-          item.name === name
-            ? { ...item, quantity: item.quantity + amount }
-            : item,
-        )
-        .filter((item) => item.quantity > 0),
-    );
   const saveCustomer = (profile) => {
-    setCustomer(profile);
+    shop.setCustomer(profile);
     if (pendingCheckout) {
       setPendingCheckout(false);
       setSelectedProduct(null);
@@ -114,7 +74,7 @@ export default function App() {
     }
   };
   const startCheckout = () => {
-    if (!customer) {
+    if (!shop.customer) {
       setCartOpen(false);
       setCustomerOpen(true);
       return;
@@ -122,28 +82,14 @@ export default function App() {
     setCartOpen(false);
     setCheckoutOpen(true);
   };
-  const confirmCheckout = ({ total, discount, method, slipName }) => {
-    setOrders((current) => [
-      {
-        id: `MM${Date.now().toString().slice(-6)}`,
-        total,
-        discount,
-        method,
-        slipName,
-        coupon: couponApplied ? "MATCHA12" : null,
-        items: cart,
-        createdAt: new Date().toLocaleDateString("th-TH"),
-      },
-      ...current,
-    ]);
-    setCart([]);
-    setCouponCode("");
+  const confirmCheckout = (payment) => {
+    shop.completeOrder(payment);
     setCartOpen(false);
     setAccountOpen(true);
     setCheckoutOpen(false);
   };
   const logout = () => {
-    setCustomer(null);
+    shop.logout();
     setAccountOpen(false);
   };
   const scrollToProducts = () =>
