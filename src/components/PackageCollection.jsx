@@ -27,7 +27,10 @@ export default function PackageCollection({ packages, products, onAdd }) {
   const [imageOpen, setImageOpen] = useState(false);
   const openPackage = (pack) => {
     setSelected(pack);
-    setSelectedMatcha(products.find((product) => product.name === pack.defaultMatcha) || products[0]);
+    setSelectedMatcha(
+      products.find((product) => product.name === pack.defaultMatcha) ||
+        products[0],
+    );
   };
   return (
     <>
@@ -108,7 +111,11 @@ export default function PackageCollection({ packages, products, onAdd }) {
                 >
                   <Box>
                     <Typography
-                      sx={{ color: "#8b8b81", fontSize: 13, textDecoration: "line-through" }}
+                      sx={{
+                        color: "#8b8b81",
+                        fontSize: 13,
+                        textDecoration: "line-through",
+                      }}
                     >
                       ปกติ ฿{pack.originalPrice}
                     </Typography>
@@ -143,13 +150,24 @@ export default function PackageCollection({ packages, products, onAdd }) {
               <Button
                 onClick={() => setImageOpen(true)}
                 aria-label={`เปิดรูป ${selected.name} ขนาดใหญ่`}
-                sx={{ display: "block", p: 0, minWidth: 0, width: "100%", mb: 2 }}
+                sx={{
+                  display: "block",
+                  p: 0,
+                  minWidth: 0,
+                  width: "100%",
+                  mb: 2,
+                }}
               >
                 <Box
                   component="img"
                   src={assetUrl(selected.image)}
                   alt={selected.name}
-                  sx={{ width: "100%", height: 210, objectFit: "cover", display: "block" }}
+                  sx={{
+                    width: "100%",
+                    height: 210,
+                    objectFit: "cover",
+                    display: "block",
+                  }}
                 />
               </Button>
               <Typography sx={{ color: "#607159", fontSize: 17 }}>
@@ -160,10 +178,20 @@ export default function PackageCollection({ packages, products, onAdd }) {
                 fullWidth
                 label="เลือกมัทฉะในแพ็ก"
                 value={selectedMatcha.name}
-                onChange={(event) => setSelectedMatcha(products.find((product) => product.name === event.target.value))}
+                onChange={(event) =>
+                  setSelectedMatcha(
+                    products.find(
+                      (product) => product.name === event.target.value,
+                    ),
+                  )
+                }
                 sx={{ mt: 2.5 }}
               >
-                {products.map((product) => <MenuItem key={product.name} value={product.name}>{product.name} · {product.size} · ฿{product.price}</MenuItem>)}
+                {products.map((product) => (
+                  <MenuItem key={product.name} value={product.name}>
+                    {product.name} · {product.size} · ฿{product.price}
+                  </MenuItem>
+                ))}
               </TextField>
               <Typography sx={{ color: "#547d3b", fontSize: 14, mt: 1 }}>
                 ราคาชุดจะปรับตามมัทฉะที่เลือก โดยยังคงส่วนลดแพ็กเกจ
@@ -173,24 +201,54 @@ export default function PackageCollection({ packages, products, onAdd }) {
               </Typography>
               <Stack component="ul" spacing={0.7} sx={{ pl: 2.5, mt: 1 }}>
                 {selected.items.map((item) => {
-                  const listedItem = item.isMatcha ? { ...selectedMatcha, price: priceOf(selectedMatcha.price) } : item;
+                  const listedItem = item.isMatcha
+                    ? {
+                        ...selectedMatcha,
+                        price: priceOf(selectedMatcha.price),
+                      }
+                    : item;
                   return (
-                  <Stack component="li" key={item.name} direction="row" justifyContent="space-between" sx={{ color: "#415444", pr: 1 }}>
-                    <Typography component="span">{listedItem.name}</Typography>
-                    <Typography component="span" sx={{ color: "#71806a" }}>{listedItem.price ? `฿${formatPrice(priceOf(listedItem.price))}` : "ของแถม"}</Typography>
-                  </Stack>
+                    <Stack
+                      component="li"
+                      key={item.name}
+                      direction="row"
+                      justifyContent="space-between"
+                      sx={{ color: "#415444", pr: 1 }}
+                    >
+                      <Typography component="span">
+                        {listedItem.name}
+                      </Typography>
+                      <Typography component="span" sx={{ color: "#71806a" }}>
+                        {listedItem.price
+                          ? `฿${formatPrice(priceOf(listedItem.price))}`
+                          : "ของแถม"}
+                      </Typography>
+                    </Stack>
                   );
                 })}
               </Stack>
-              <Stack direction="row" spacing={1.25} alignItems="baseline" sx={{ mt: 2.5 }}>
-                <Typography sx={{ color: "#8b8b81", textDecoration: "line-through" }}>
+              <Stack
+                direction="row"
+                spacing={1.25}
+                alignItems="baseline"
+                sx={{ mt: 2.5 }}
+              >
+                <Typography
+                  sx={{ color: "#8b8b81", textDecoration: "line-through" }}
+                >
                   ฿{formatPrice(packPricing(selected, selectedMatcha).original)}
                 </Typography>
-                <Typography sx={{ color: "#a8874b", fontSize: 25, fontWeight: 700 }}>
+                <Typography
+                  sx={{ color: "#a8874b", fontSize: 25, fontWeight: 700 }}
+                >
                   ฿{formatPrice(packPricing(selected, selectedMatcha).price)}
                 </Typography>
                 <Typography sx={{ color: "#547d3b", fontSize: 14 }}>
-                  ประหยัด ฿{formatPrice(packPricing(selected, selectedMatcha).original - packPricing(selected, selectedMatcha).price)}
+                  ประหยัด ฿
+                  {formatPrice(
+                    packPricing(selected, selectedMatcha).original -
+                      packPricing(selected, selectedMatcha).price,
+                  )}
                 </Typography>
               </Stack>
             </>
@@ -203,7 +261,13 @@ export default function PackageCollection({ packages, products, onAdd }) {
           <Button
             onClick={() => {
               const pricing = packPricing(selected, selectedMatcha);
-              onAdd({ ...selected, name: `${selected.name} · ${selectedMatcha.name}`, price: formatPrice(pricing.price), size: "Gift set", selectedMatcha: selectedMatcha.name });
+              onAdd({
+                ...selected,
+                name: `${selected.name} · ${selectedMatcha.name}`,
+                price: formatPrice(pricing.price),
+                size: "Gift set",
+                selectedMatcha: selectedMatcha.name,
+              });
               setSelected(null);
             }}
             variant="contained"
@@ -213,8 +277,26 @@ export default function PackageCollection({ packages, products, onAdd }) {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={imageOpen} onClose={() => setImageOpen(false)} maxWidth="md" fullWidth>
-        {selected && <Box component="img" src={assetUrl(selected.image)} alt={`${selected.name} ขนาดใหญ่`} sx={{ width: "100%", maxHeight: "82vh", objectFit: "contain", display: "block", bgcolor: "#183b2a" }} />}
+      <Dialog
+        open={imageOpen}
+        onClose={() => setImageOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        {selected && (
+          <Box
+            component="img"
+            src={assetUrl(selected.image)}
+            alt={`${selected.name} ขนาดใหญ่`}
+            sx={{
+              width: "100%",
+              maxHeight: "82vh",
+              objectFit: "contain",
+              display: "block",
+              bgcolor: "#183b2a",
+            }}
+          />
+        )}
       </Dialog>
     </>
   );

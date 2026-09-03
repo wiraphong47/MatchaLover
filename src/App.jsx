@@ -10,6 +10,7 @@ import SiteFooter from "./components/SiteFooter";
 import CustomerDialog from "./components/CustomerDialog";
 import CartDrawer from "./components/CartDrawer";
 import AccountPanel from "./components/AccountPanel";
+import MemberDashboard from "./components/MemberDashboard";
 import RecommendationQuiz from "./components/RecommendationQuiz";
 import PackageCollection from "./components/PackageCollection";
 import BrewTools from "./components/BrewTools";
@@ -28,6 +29,7 @@ export default function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [customerOpen, setCustomerOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
+  const [memberOpen, setMemberOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
   const {
@@ -85,12 +87,17 @@ export default function App() {
   const confirmCheckout = (payment) => {
     shop.completeOrder(payment);
     setCartOpen(false);
-    setAccountOpen(true);
+    setMemberOpen(true);
     setCheckoutOpen(false);
   };
   const logout = () => {
     shop.logout();
     setAccountOpen(false);
+    setMemberOpen(false);
+  };
+  const openMemberPortal = () => {
+    if (customer) setMemberOpen(true);
+    else setCustomerOpen(true);
   };
   const scrollToProducts = () =>
     document.querySelector("#products")?.scrollIntoView({ behavior: "smooth" });
@@ -107,11 +114,13 @@ export default function App() {
   const returnHome = () => {
     setSelectedProduct(null);
     setCheckoutOpen(false);
+    setMemberOpen(false);
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
   };
   const navigateToSection = (selector) => {
     setSelectedProduct(null);
     setCheckoutOpen(false);
+    setMemberOpen(false);
     window.setTimeout(
       () =>
         document
@@ -120,6 +129,15 @@ export default function App() {
       0,
     );
   };
+  if (memberOpen)
+    return (
+      <>
+        <SiteHeader onHome={returnHome} onProducts={() => navigateToSection("#products")} onStory={() => navigateToSection("#story")} cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onOpenAccount={openMemberPortal} customer={customer} />
+        <MemberDashboard customer={customer} orders={orders} onBack={returnHome} onSave={saveCustomer} onLogout={logout} />
+        <SiteFooter />
+        <CustomerDialog open={customerOpen} onClose={() => setCustomerOpen(false)} customer={customer} onSave={saveCustomer} />
+      </>
+    );
   if (checkoutOpen)
     return (
       <>
@@ -129,9 +147,7 @@ export default function App() {
           onStory={() => navigateToSection("#story")}
           cartCount={cartCount}
           onOpenCart={() => setCartOpen(true)}
-          onOpenAccount={() =>
-            customer ? setAccountOpen(true) : setCustomerOpen(true)
-          }
+          onOpenAccount={openMemberPortal}
           customer={customer}
         />
         <CheckoutPage
@@ -173,9 +189,7 @@ export default function App() {
           onStory={() => navigateToSection("#story")}
           cartCount={cartCount}
           onOpenCart={() => setCartOpen(true)}
-          onOpenAccount={() =>
-            customer ? setAccountOpen(true) : setCustomerOpen(true)
-          }
+          onOpenAccount={openMemberPortal}
           customer={customer}
         />
         <ProductDetails
@@ -230,9 +244,7 @@ export default function App() {
         onStory={() => navigateToSection("#story")}
         cartCount={cartCount}
         onOpenCart={() => setCartOpen(true)}
-        onOpenAccount={() =>
-          customer ? setAccountOpen(true) : setCustomerOpen(true)
-        }
+        onOpenAccount={openMemberPortal}
         customer={customer}
       />
       <Box component="main">

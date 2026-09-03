@@ -36,8 +36,12 @@ export default function AccountPanel({
               </Typography>
             </Box>
             <Stack direction="row" spacing={1}>
-              <Button onClick={onEdit} sx={{ mt: 1 }}>แก้ไขข้อมูล</Button>
-              <Button onClick={onLogout} color="inherit" sx={{ mt: 1 }}>ออกจากระบบ</Button>
+              <Button onClick={onEdit} sx={{ mt: 1 }}>
+                แก้ไขข้อมูล
+              </Button>
+              <Button onClick={onLogout} color="inherit" sx={{ mt: 1 }}>
+                ออกจากระบบ
+              </Button>
             </Stack>
             <Divider sx={{ my: 2 }} />
             <Typography sx={{ fontFamily: "Pridi, serif", fontSize: 25 }}>

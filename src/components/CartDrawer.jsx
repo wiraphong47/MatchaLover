@@ -98,18 +98,48 @@ export default function CartDrawer({
             รับส่วนลด 12% ด้วยโค้ด MATCHA12
           </Typography>
           <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-            <TextField value={couponCode} onChange={(event) => onCouponChange(event.target.value)} placeholder="กรอกโค้ดส่วนลด" size="small" fullWidth />
-            <Button variant="outlined" sx={{ whiteSpace: "nowrap" }}>ใช้โค้ด</Button>
+            <TextField
+              value={couponCode}
+              onChange={(event) => onCouponChange(event.target.value)}
+              placeholder="กรอกโค้ดส่วนลด"
+              size="small"
+              fullWidth
+            />
+            <Button variant="outlined" sx={{ whiteSpace: "nowrap" }}>
+              ใช้โค้ด
+            </Button>
           </Stack>
-          {couponCode && <Typography sx={{ mt: .8, fontSize: 13, color: couponApplied ? "#547d3b" : "#a34c3b" }}>{couponApplied ? "ใช้คูปองสำเร็จ ลด 12%" : "รหัสคูปองไม่ถูกต้อง"}</Typography>}
+          {couponCode && (
+            <Typography
+              sx={{
+                mt: 0.8,
+                fontSize: 13,
+                color: couponApplied ? "#547d3b" : "#a34c3b",
+              }}
+            >
+              {couponApplied ? "ใช้คูปองสำเร็จ ลด 12%" : "รหัสคูปองไม่ถูกต้อง"}
+            </Typography>
+          )}
         </Box>
         <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }}>
-          <Typography>ยอดสินค้า</Typography><Typography>฿{subtotal}</Typography>
+          <Typography>ยอดสินค้า</Typography>
+          <Typography>฿{subtotal}</Typography>
         </Stack>
-        {couponApplied && <Stack direction="row" justifyContent="space-between" sx={{ mt: .7, color: "#547d3b" }}><Typography>ส่วนลด 12%</Typography><Typography>-฿{discount}</Typography></Stack>}
+        {couponApplied && (
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            sx={{ mt: 0.7, color: "#547d3b" }}
+          >
+            <Typography>ส่วนลด 12%</Typography>
+            <Typography>-฿{discount}</Typography>
+          </Stack>
+        )}
         <Stack direction="row" justifyContent="space-between" sx={{ mt: 1.2 }}>
           <Typography sx={{ fontWeight: 700 }}>ยอดสุทธิ</Typography>
-          <Typography sx={{ fontSize: 23, fontWeight: 700, color: "#a8874b" }}>฿{total}</Typography>
+          <Typography sx={{ fontSize: 23, fontWeight: 700, color: "#a8874b" }}>
+            ฿{total}
+          </Typography>
         </Stack>
         {!customer && (
           <Box sx={{ mt: 2, p: 1.8, bgcolor: "#eef1df" }}>

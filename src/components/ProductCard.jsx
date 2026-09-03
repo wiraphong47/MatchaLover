@@ -110,7 +110,12 @@ export default function ProductCard({ product, onView, onAdd }) {
           variant="contained"
           disableElevation
           fullWidth
-          sx={{ mt: 1, bgcolor: "#183b2a", fontSize: 16, "&:hover": { bgcolor: "#28573f" } }}
+          sx={{
+            mt: 1,
+            bgcolor: "#183b2a",
+            fontSize: 16,
+            "&:hover": { bgcolor: "#28573f" },
+          }}
         >
           เพิ่มลงตะกร้า
         </Button>

@@ -1,6 +1,12 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { assetUrl } from "../utils/assets";
-export default function ProductDetails({ product, onBack, onAdd, onBuyNow, recommendation }) {
+export default function ProductDetails({
+  product,
+  onBack,
+  onAdd,
+  onBuyNow,
+  recommendation,
+}) {
   return (
     <Box
       component="main"
@@ -78,7 +84,14 @@ export default function ProductDetails({ product, onBack, onAdd, onBuyNow, recom
             {[
               ["รสสัมผัส", product.note],
               ["เหมาะสำหรับ", product.use],
-              ...(product.aroma ? [["กลิ่น", product.aroma], ["รส", product.taste], ["สำหรับคนไทย", product.thaiPreference], ["แหล่งปลูก", product.origin]] : []),
+              ...(product.aroma
+                ? [
+                    ["กลิ่น", product.aroma],
+                    ["รส", product.taste],
+                    ["สำหรับคนไทย", product.thaiPreference],
+                    ["แหล่งปลูก", product.origin],
+                  ]
+                : []),
             ].map(([label, value], index) => (
               <Stack
                 key={label}
@@ -114,15 +127,52 @@ export default function ProductDetails({ product, onBack, onAdd, onBuyNow, recom
               ฿{product.price}
             </Typography>
             <Stack direction="row" spacing={1}>
-              <Button onClick={() => onAdd(product)} variant="outlined" sx={{ borderColor: "#183b2a", color: "#183b2a", fontSize: 16 }}>เพิ่มตะกร้า</Button>
-              <Button onClick={() => onBuyNow(product)} variant="contained" disableElevation sx={{ bgcolor: "#183b2a", fontSize: 16, "&:hover": { bgcolor: "#28573f" } }}>ชำระเงินเลย</Button>
+              <Button
+                onClick={() => onAdd(product)}
+                variant="outlined"
+                sx={{ borderColor: "#183b2a", color: "#183b2a", fontSize: 16 }}
+              >
+                เพิ่มตะกร้า
+              </Button>
+              <Button
+                onClick={() => onBuyNow(product)}
+                variant="contained"
+                disableElevation
+                sx={{
+                  bgcolor: "#183b2a",
+                  fontSize: 16,
+                  "&:hover": { bgcolor: "#28573f" },
+                }}
+              >
+                ชำระเงินเลย
+              </Button>
             </Stack>
           </Stack>
           {recommendation && (
-            <Box sx={{ mt: 4, p: 2.2, bgcolor: "#eef1df", borderLeft: "3px solid #a8874b" }}>
-              <Typography sx={{ color: "#6c815e", fontSize: 12, fontWeight: 700, letterSpacing: ".12em" }}>แนะนำให้ลองต่อ</Typography>
-              <Typography sx={{ mt: .4, fontSize: 18, fontWeight: 700 }}>{recommendation.name}</Typography>
-              <Typography sx={{ color: "#536154", fontSize: 15, mt: .4 }}>{recommendation.use} · ฿{recommendation.price}</Typography>
+            <Box
+              sx={{
+                mt: 4,
+                p: 2.2,
+                bgcolor: "#eef1df",
+                borderLeft: "3px solid #a8874b",
+              }}
+            >
+              <Typography
+                sx={{
+                  color: "#6c815e",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: ".12em",
+                }}
+              >
+                แนะนำให้ลองต่อ
+              </Typography>
+              <Typography sx={{ mt: 0.4, fontSize: 18, fontWeight: 700 }}>
+                {recommendation.name}
+              </Typography>
+              <Typography sx={{ color: "#536154", fontSize: 15, mt: 0.4 }}>
+                {recommendation.use} · ฿{recommendation.price}
+              </Typography>
             </Box>
           )}
         </Box>
