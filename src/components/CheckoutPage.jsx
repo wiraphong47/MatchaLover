@@ -33,7 +33,7 @@ export default function CheckoutPage({
       sx={{
         minHeight: "75vh",
         bgcolor: "#eee9dd",
-        px: { xs: 2.5, md: "10vw" },
+        px: { xs: 1.5, sm: 2.5, md: "10vw" },
         py: { xs: 4, md: 7 },
       }}
     >
@@ -49,8 +49,8 @@ export default function CheckoutPage({
           mx: "auto",
         }}
       >
-        <Box sx={{ bgcolor: "#fffdf9", p: { xs: 3, md: 5 } }}>
-          <Typography variant="h1" sx={{ fontSize: { xs: 38, md: 48 } }}>
+        <Box sx={{ bgcolor: "#fffdf9", p: { xs: 2.5, sm: 3, md: 5 } }}>
+          <Typography variant="h1" sx={{ fontSize: { xs: 34, md: 48 } }}>
             ชำระเงิน
           </Typography>
           <Typography sx={{ color: "#607159", mt: 1 }}>
@@ -123,7 +123,7 @@ export default function CheckoutPage({
                   label="หมายเลขบัตร"
                   placeholder="0000 0000 0000 0000"
                 />
-                <Stack direction="row" spacing={1.5}>
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                   <TextField label="วันหมดอายุ" placeholder="MM/YY" fullWidth />
                   <TextField label="CVV" placeholder="123" fullWidth />
                 </Stack>
@@ -165,9 +165,10 @@ export default function CheckoutPage({
                 key={item.name}
                 direction="row"
                 justifyContent="space-between"
-                gap={2}
+                gap={1.5}
+                alignItems="flex-start"
               >
-                <Typography>
+                <Typography sx={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>
                   {item.name} × {item.quantity}
                 </Typography>
                 <Typography>฿{priceOf(item.price) * item.quantity}</Typography>

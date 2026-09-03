@@ -1,5 +1,9 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
+import { useState } from "react";
+
 export default function GradeGuide({ products }) {
+  const [showAll, setShowAll] = useState(false);
+  const visibleProducts = showAll ? products : products.slice(0, 3);
   return (
     <Box
       sx={{
@@ -32,14 +36,15 @@ export default function GradeGuide({ products }) {
           <br />
         </Typography>
       </Box>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "repeat(3,1fr)" },
-          gap: 3.75,
-        }}
-      >
-        {products.map((p, index) => (
+      <Box>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "repeat(3,1fr)" },
+            gap: 3.75,
+          }}
+        >
+        {visibleProducts.map((p, index) => (
           <Box
             key={p.name}
             sx={{
@@ -79,6 +84,21 @@ export default function GradeGuide({ products }) {
             </Box>
           </Box>
         ))}
+        </Box>
+        {products.length > 3 && (
+          <Button
+            onClick={() => setShowAll((current) => !current)}
+            variant="outlined"
+            sx={{
+              mt: 3.5,
+              color: "#fdf9eb",
+              borderColor: "#d6c18e",
+              "&:hover": { borderColor: "#f3dc9b", bgcolor: "rgba(255,255,255,.06)" },
+            }}
+          >
+            {showAll ? "แสดงน้อยลง" : `แสดงเพิ่มเติม (${products.length - 3} รายการ)`}
+          </Button>
+        )}
       </Box>
     </Box>
   );

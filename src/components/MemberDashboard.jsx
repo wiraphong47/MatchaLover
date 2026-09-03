@@ -29,12 +29,12 @@ export default function MemberDashboard({ customer, orders, onBack, onLogout, on
       <Button onClick={onBack} sx={{ color: "#183b2a", px: 0, mb: 2 }}>← กลับหน้าหลัก</Button>
       <Box sx={{ bgcolor: "#fffdf9", borderRadius: { xs: 3, md: 5 }, p: { xs: 3, md: 5 }, boxShadow: "0 18px 50px rgba(31,52,37,.08)" }}>
         <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" gap={2}>
-          <Box><Typography sx={{ color: "#a8874b", fontSize: 13, fontWeight: 700, letterSpacing: ".14em" }}>MATCHA MORI MEMBER</Typography><Typography variant="h1" sx={{ fontSize: { xs: 35, md: 46 }, mt: .5 }}>Member Portal & CDP Dashboard</Typography><Typography sx={{ color: "#607159", fontSize: 17, mt: .5 }}>ข้อมูลลูกค้า 360 องศา และประวัติการสั่งซื้อของคุณ</Typography></Box>
+          <Box><Typography sx={{ color: "#a8874b", fontSize: 13, fontWeight: 700, letterSpacing: ".14em" }}>MATCHA MORI MEMBER</Typography><Typography variant="h1" sx={{ fontSize: { xs: 29, sm: 35, md: 46 }, lineHeight: 1.15, mt: .5 }}>Member Portal & CDP Dashboard</Typography><Typography sx={{ color: "#607159", fontSize: { xs: 16, md: 17 }, mt: .5 }}>ข้อมูลลูกค้า 360 องศา และประวัติการสั่งซื้อของคุณ</Typography></Box>
           <Chip label="● พร้อมใช้งาน" sx={{ alignSelf: { md: "start" }, bgcolor: "#e5eedc", color: "#547d3b", fontWeight: 700 }} />
         </Stack>
-        <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mt: 3, pb: 2.5, borderBottom: "1px solid #e2dbcb" }}>
-          <Button onClick={() => setTab("profile")} variant={tab === "profile" ? "contained" : "outlined"} sx={tab === "profile" ? { bgcolor: "#183b2a" } : { color: "#183b2a", borderColor: "#cfc5b2" }}>ข้อมูลลูกค้า (CDP Profile)</Button>
-          <Button onClick={() => setTab("orders")} variant={tab === "orders" ? "contained" : "outlined"} sx={tab === "orders" ? { bgcolor: "#183b2a" } : { color: "#183b2a", borderColor: "#cfc5b2" }}>ประวัติการสั่งซื้อ ({orders.length})</Button>
+        <Stack direction={{ xs: "column", sm: "row" }} flexWrap="wrap" gap={1} sx={{ mt: 3, pb: 2.5, borderBottom: "1px solid #e2dbcb" }}>
+          <Button onClick={() => setTab("profile")} variant={tab === "profile" ? "contained" : "outlined"} sx={tab === "profile" ? { bgcolor: "#183b2a", width: { xs: "100%", sm: "auto" } } : { color: "#183b2a", borderColor: "#cfc5b2", width: { xs: "100%", sm: "auto" } }}>ข้อมูลลูกค้า (CDP Profile)</Button>
+          <Button onClick={() => setTab("orders")} variant={tab === "orders" ? "contained" : "outlined"} sx={tab === "orders" ? { bgcolor: "#183b2a", width: { xs: "100%", sm: "auto" } } : { color: "#183b2a", borderColor: "#cfc5b2", width: { xs: "100%", sm: "auto" } }}>ประวัติการสั่งซื้อ ({orders.length})</Button>
         </Stack>
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(3,1fr)" }, gap: 2, my: 3 }}>
           {[["สถานะสมาชิก", "VIP Green Member", "🌿"], ["คะแนนสะสม", `${points} Points`, "✦"], ["ยอดสั่งซื้อสะสม", money(totalSpent), "🛍️"]].map(([label, value, icon]) => <Box key={label} sx={{ p: 2.5, bgcolor: "#f5f0e5", border: "1px solid #e2dac9", borderRadius: 2 }}><Typography sx={{ color: "#607159", fontSize: 14 }}>{icon} {label}</Typography><Typography sx={{ fontSize: 23, fontWeight: 700, color: "#a8874b", mt: .5 }}>{value}</Typography></Box>)}

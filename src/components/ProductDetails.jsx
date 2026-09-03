@@ -11,7 +11,7 @@ export default function ProductDetails({
     <Box
       component="main"
       sx={{
-        p: { xs: "28px 20px 65px", md: "48px 10vw 88px" },
+        p: { xs: "20px 14px 48px", sm: "28px 20px 65px", md: "48px 10vw 88px" },
         minHeight: 620,
         bgcolor: "#eee9dd",
       }}
@@ -46,11 +46,11 @@ export default function ProductDetails({
           alt={`${product.name} ผงมัทฉะ`}
           sx={{
             width: "100%",
-            height: { xs: 320, md: 530 },
+            height: { xs: 260, sm: 320, md: 530 },
             objectFit: "cover",
           }}
         />
-        <Box sx={{ p: { xs: 3.5, md: "52px 58px" } }}>
+        <Box sx={{ p: { xs: 2.5, sm: 3.5, md: "52px 58px" } }}>
           <Typography
             sx={{
               color: "#79856a",
@@ -61,7 +61,7 @@ export default function ProductDetails({
           >
             MATCHA MORI · {product.size}
           </Typography>
-          <Typography variant="h1" sx={{ fontSize: { xs: 40, md: 52 }, mt: 1 }}>
+          <Typography variant="h1" sx={{ fontSize: { xs: 33, sm: 40, md: 52 }, lineHeight: 1.15, mt: 1, overflowWrap: "anywhere" }}>
             {product.name}
           </Typography>
           <Typography
@@ -95,17 +95,17 @@ export default function ProductDetails({
             ].map(([label, value], index) => (
               <Stack
                 key={label}
-                direction="row"
+                direction={{ xs: "column", sm: "row" }}
                 sx={{
-                  py: 1.8,
-                  gap: 2,
+                  py: { xs: 1.15, sm: 1.8 },
+                  gap: { xs: .3, sm: 2 },
                   borderBottom: "1px solid #dcd3c2",
                 }}
               >
-                <Typography sx={{ width: 115, fontSize: 15, color: "#788272" }}>
+                <Typography sx={{ width: { sm: 115 }, fontSize: 15, color: "#788272" }}>
                   {label}
                 </Typography>
-                <Typography sx={{ fontSize: 15, fontWeight: 700 }}>
+                <Typography sx={{ fontSize: 15, fontWeight: 700, overflowWrap: "anywhere" }}>
                   {value}
                 </Typography>
               </Stack>
@@ -126,11 +126,11 @@ export default function ProductDetails({
             >
               ฿{product.price}
             </Typography>
-            <Stack direction="row" spacing={1}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", sm: "auto" } }}>
               <Button
                 onClick={() => onAdd(product)}
                 variant="outlined"
-                sx={{ borderColor: "#183b2a", color: "#183b2a", fontSize: 16 }}
+                sx={{ borderColor: "#183b2a", color: "#183b2a", fontSize: 16, flex: 1 }}
               >
                 เพิ่มตะกร้า
               </Button>
@@ -141,7 +141,7 @@ export default function ProductDetails({
                 sx={{
                   bgcolor: "#183b2a",
                   fontSize: 16,
-                  "&:hover": { bgcolor: "#28573f" },
+                  "&:hover": { bgcolor: "#28573f" }, flex: 1,
                 }}
               >
                 ชำระเงินเลย

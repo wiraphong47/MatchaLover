@@ -19,11 +19,13 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
     <>
       <Box
         sx={{
-          py: 1,
+          py: { xs: 0.85, md: 1 },
           bgcolor: "#183b2a",
           color: "#f8f1df",
           textAlign: "center",
           fontSize: { xs: 12, md: 14 },
+          whiteSpace: "nowrap",
+          overflow: "hidden",
         }}
       >
         ส่งฟรีเมื่อสั่งซื้อครบ 1,200 บาท{" "}
@@ -38,7 +40,7 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
         sx={{ bgcolor: "#fffdf9", borderBottom: "1px solid #dcd3c2" }}
       >
         <Toolbar
-          sx={{ minHeight: { xs: 90, md: 108 }, px: { xs: 2.5, md: "8vw" } }}
+          sx={{ minHeight: { xs: 76, md: 108 }, px: { xs: 1.5, md: "8vw" }, gap: { xs: 1, md: 0 } }}
         >
           <Box
             component="a"
@@ -60,19 +62,19 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
               src={assetUrl("matcha-mori-logo.png")}
               alt="Matcha Mori"
               sx={{
-                width: { xs: 54, md: 72 },
-                height: { xs: 54, md: 72 },
+                width: { xs: 45, md: 72 },
+                height: { xs: 45, md: 72 },
                 objectFit: "cover",
                 objectPosition: "center 23%",
                 borderRadius: "50%",
                 border: "1px solid #c1aa78",
-                mr: { xs: 1.4, md: 2 },
+                mr: { xs: 0.9, md: 2 },
               }}
             />
             <Typography
               sx={{
                 fontFamily: "Pridi, serif",
-                fontSize: { xs: 25, md: 34 },
+                fontSize: { xs: 21, md: 34 },
                 lineHeight: 0.76,
                 fontWeight: 600,
               }}
@@ -86,7 +88,7 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
           </Box>
           <Stack
             direction="row"
-            sx={{ flex: 1, justifyContent: "center", gap: 1 }}
+            sx={{ flex: 1, justifyContent: "center", gap: 1, display: { xs: "none", md: "flex" } }}
           >
             <Button
               href="#top"
@@ -112,7 +114,7 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
               justifyContent: "flex-end",
             }}
           >
-            <Button onClick={onOpenAccount} sx={{ display: { xs: "none", md: "inline-flex" }, color: "#183b2a", mr: 1, fontSize: 16 }}>
+            <Button onClick={onOpenAccount} sx={{ color: "#183b2a", mr: { xs: 0, md: 1 }, px: { xs: .6, md: 1 }, fontSize: { xs: 12, md: 16 }, whiteSpace: "nowrap" }}>
               {customer ? "บัญชีของฉัน" : "สมัครสมาชิก"}
             </Button>
             <Button
@@ -121,9 +123,9 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
               sx={{
                 borderColor: "#183b2a",
                 color: "#183b2a",
-                px: { xs: 1.3, md: 2 },
-                py: 1,
-                fontSize: { xs: 11, md: 16 },
+                px: { xs: .8, md: 2 },
+                py: { xs: .75, md: 1 },
+                fontSize: { xs: 0, md: 16 },
               }}
             >
               ตะกร้าสินค้า{" "}
@@ -131,7 +133,7 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
                 label={cartCount}
                 size="small"
                 sx={{
-                  ml: 1,
+                  ml: { xs: 0, md: 1 },
                   height: 18,
                   color: "#fff",
                   bgcolor: "#a8874b",
