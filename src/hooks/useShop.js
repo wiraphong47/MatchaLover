@@ -15,18 +15,33 @@ const readStoredValue = (key, fallback) => {
 };
 
 export default function useShop() {
-  const [cart, setCart] = useState(() => readStoredValue(STORAGE_KEYS.cart, []));
-  const [customer, setCustomer] = useState(() => readStoredValue(STORAGE_KEYS.customer, null));
-  const [orders, setOrders] = useState(() => readStoredValue(STORAGE_KEYS.orders, []));
+  const [cart, setCart] = useState(() =>
+    readStoredValue(STORAGE_KEYS.cart, [])
+  );
+  const [customer, setCustomer] = useState(() =>
+    readStoredValue(STORAGE_KEYS.customer, null)
+  );
+  const [orders, setOrders] = useState(() =>
+    readStoredValue(STORAGE_KEYS.orders, [])
+  );
   const [couponCode, setCouponCode] = useState("");
 
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(cart)), [cart]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.customer, JSON.stringify(customer)), [customer]);
-  useEffect(() => localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(orders)), [orders]);
+  useEffect(
+    () => localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(cart)),
+    [cart]
+  );
+  useEffect(
+    () => localStorage.setItem(STORAGE_KEYS.customer, JSON.stringify(customer)),
+    [customer]
+  );
+  useEffect(
+    () => localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(orders)),
+    [orders]
+  );
 
   const cartCount = useMemo(
     () => cart.reduce((sum, item) => sum + item.quantity, 0),
-    [cart],
+    [cart]
   );
   const couponApplied = couponCode.trim().toUpperCase() === "MATCHA12";
 
@@ -36,9 +51,9 @@ export default function useShop() {
         ? current.map((item) =>
             item.name === product.name
               ? { ...item, quantity: item.quantity + 1 }
-              : item,
+              : item
           )
-        : [...current, { ...product, quantity: 1 }],
+        : [...current, { ...product, quantity: 1 }]
     );
   };
 
@@ -48,7 +63,7 @@ export default function useShop() {
       ? cart.map((item) =>
           item.name === product.name
             ? { ...item, quantity: item.quantity + 1 }
-            : item,
+            : item
         )
       : [...cart, { ...product, quantity: 1 }];
   };
@@ -59,12 +74,18 @@ export default function useShop() {
         .map((item) =>
           item.name === name
             ? { ...item, quantity: item.quantity + amount }
-            : item,
+            : item
         )
-        .filter((item) => item.quantity > 0),
+        .filter((item) => item.quantity > 0)
     );
 
-  const completeOrder = ({ total, discount, method, slipName }) => {
+  const completeOrder = ({
+    total,
+    discount,
+    method,
+    slipName,
+    customer: orderCustomer,
+  }) => {
     setOrders((current) => [
       {
         id: `MM${Date.now().toString().slice(-6)}`,
@@ -75,6 +96,9 @@ export default function useShop() {
         coupon: couponApplied ? "MATCHA12" : null,
         items: cart,
         createdAt: new Date().toLocaleDateString("th-TH"),
+        customerName: orderCustomer?.name || "สมาชิก Matcha Mori",
+        customerEmail: orderCustomer?.email || "",
+        memberId: orderCustomer?.memberId || "",
       },
       ...current,
     ]);

@@ -61,7 +61,15 @@ export default function ProductDetails({
           >
             MATCHA MORI · {product.size}
           </Typography>
-          <Typography variant="h1" sx={{ fontSize: { xs: 33, sm: 40, md: 52 }, lineHeight: 1.15, mt: 1, overflowWrap: "anywhere" }}>
+          <Typography
+            variant="h1"
+            sx={{
+              fontSize: { xs: 33, sm: 40, md: 52 },
+              lineHeight: 1.15,
+              mt: 1,
+              overflowWrap: "anywhere",
+            }}
+          >
             {product.name}
           </Typography>
           <Typography
@@ -98,14 +106,22 @@ export default function ProductDetails({
                 direction={{ xs: "column", sm: "row" }}
                 sx={{
                   py: { xs: 1.15, sm: 1.8 },
-                  gap: { xs: .3, sm: 2 },
+                  gap: { xs: 0.3, sm: 2 },
                   borderBottom: "1px solid #dcd3c2",
                 }}
               >
-                <Typography sx={{ width: { sm: 115 }, fontSize: 15, color: "#788272" }}>
+                <Typography
+                  sx={{ width: { sm: 115 }, fontSize: 15, color: "#788272" }}
+                >
                   {label}
                 </Typography>
-                <Typography sx={{ fontSize: 15, fontWeight: 700, overflowWrap: "anywhere" }}>
+                <Typography
+                  sx={{
+                    fontSize: 15,
+                    fontWeight: 700,
+                    overflowWrap: "anywhere",
+                  }}
+                >
                   {value}
                 </Typography>
               </Stack>
@@ -126,11 +142,20 @@ export default function ProductDetails({
             >
               ฿{product.price}
             </Typography>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ width: { xs: "100%", sm: "auto" } }}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1}
+              sx={{ width: { xs: "100%", sm: "auto" } }}
+            >
               <Button
                 onClick={() => onAdd(product)}
                 variant="outlined"
-                sx={{ borderColor: "#183b2a", color: "#183b2a", fontSize: 16, flex: 1 }}
+                sx={{
+                  borderColor: "#183b2a",
+                  color: "#183b2a",
+                  fontSize: 16,
+                  flex: 1,
+                }}
               >
                 เพิ่มตะกร้า
               </Button>
@@ -141,7 +166,8 @@ export default function ProductDetails({
                 sx={{
                   bgcolor: "#183b2a",
                   fontSize: 16,
-                  "&:hover": { bgcolor: "#28573f" }, flex: 1,
+                  "&:hover": { bgcolor: "#28573f" },
+                  flex: 1,
                 }}
               >
                 ชำระเงินเลย

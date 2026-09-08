@@ -23,7 +23,7 @@ export default function CheckoutPage({
   const [slipName, setSlipName] = useState("");
   const subtotal = cart.reduce(
     (sum, item) => sum + priceOf(item.price) * item.quantity,
-    0,
+    0
   );
   const discount = couponApplied ? Math.round(subtotal * 0.12) : 0;
   const total = subtotal - discount;
@@ -123,7 +123,7 @@ export default function CheckoutPage({
                   label="หมายเลขบัตร"
                   placeholder="0000 0000 0000 0000"
                 />
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
                   <TextField label="วันหมดอายุ" placeholder="MM/YY" fullWidth />
                   <TextField label="CVV" placeholder="123" fullWidth />
                 </Stack>
@@ -168,7 +168,9 @@ export default function CheckoutPage({
                 gap={1.5}
                 alignItems="flex-start"
               >
-                <Typography sx={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}>
+                <Typography
+                  sx={{ flex: 1, minWidth: 0, overflowWrap: "anywhere" }}
+                >
                   {item.name} × {item.quantity}
                 </Typography>
                 <Typography>฿{priceOf(item.price) * item.quantity}</Typography>

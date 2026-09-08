@@ -10,6 +10,7 @@ import SiteFooter from "./components/SiteFooter";
 import CustomerDialog from "./components/CustomerDialog";
 import CartDrawer from "./components/CartDrawer";
 import AccountPanel from "./components/AccountPanel";
+import LoginPage from "./components/LoginPage";
 import MemberDashboard from "./components/MemberDashboard";
 import RecommendationQuiz from "./components/RecommendationQuiz";
 import PackageCollection from "./components/PackageCollection";
@@ -21,6 +22,7 @@ import Faq from "./components/Faq";
 import { products } from "./data/products";
 import { brewTools, packages } from "./data/collections";
 import { assetUrl } from "./utils/assets";
+import { createMemberId } from "./utils/member";
 import useShop from "./hooks/useShop";
 
 export default function App() {
@@ -28,10 +30,15 @@ export default function App() {
   const shop = useShop();
   const [cartOpen, setCartOpen] = useState(false);
   const [customerOpen, setCustomerOpen] = useState(false);
+  const [customerDialogMode, setCustomerDialogMode] = useState("register");
   const [accountOpen, setAccountOpen] = useState(false);
   const [memberOpen, setMemberOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    () => sessionStorage.getItem("matcha-mori-session") === "true"
+  );
   const {
     addToCart,
     cart,
@@ -46,6 +53,7 @@ export default function App() {
   } = shop;
   const [category, setCategory] = useState("all");
   const [query, setQuery] = useState("");
+  const activeCustomer = isLoggedIn ? customer : null;
   const matchesSearch = (item) =>
     JSON.stringify(item).toLowerCase().includes(query.trim().toLowerCase());
   const filteredProducts = products.filter(matchesSearch);
@@ -53,9 +61,10 @@ export default function App() {
   const filteredTools = brewTools.filter(matchesSearch);
   const buyNow = (product) => {
     shop.setCart(shop.addProductToCart(product));
-    if (!shop.customer) {
+    if (!isLoggedIn) {
       setPendingCheckout(true);
-      setCustomerOpen(true);
+      if (customer) setLoginOpen(true);
+      else openRegistration();
       return;
     }
     setSelectedProduct(null);
@@ -67,7 +76,12 @@ export default function App() {
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
   };
   const saveCustomer = (profile) => {
-    shop.setCustomer(profile);
+    shop.setCustomer({
+      ...profile,
+      memberId: profile.memberId || createMemberId(profile),
+    });
+    setIsLoggedIn(true);
+    sessionStorage.setItem("matcha-mori-session", "true");
     if (pendingCheckout) {
       setPendingCheckout(false);
       setSelectedProduct(null);
@@ -76,28 +90,55 @@ export default function App() {
     }
   };
   const startCheckout = () => {
-    if (!shop.customer) {
+    if (!isLoggedIn) {
       setCartOpen(false);
-      setCustomerOpen(true);
+      if (customer) setLoginOpen(true);
+      else openRegistration();
       return;
     }
     setCartOpen(false);
     setCheckoutOpen(true);
   };
   const confirmCheckout = (payment) => {
-    shop.completeOrder(payment);
+    shop.completeOrder({ ...payment, customer });
     setCartOpen(false);
     setMemberOpen(true);
     setCheckoutOpen(false);
   };
   const logout = () => {
-    shop.logout();
+    setIsLoggedIn(false);
+    sessionStorage.removeItem("matcha-mori-session");
     setAccountOpen(false);
     setMemberOpen(false);
   };
+  const openRegistration = () => {
+    setCustomerDialogMode("register");
+    setCustomerOpen(true);
+  };
+  const openCustomerEdit = () => {
+    setCustomerDialogMode("edit");
+    setCustomerOpen(true);
+  };
   const openMemberPortal = () => {
-    if (customer) setMemberOpen(true);
-    else setCustomerOpen(true);
+    if (isLoggedIn) setMemberOpen(true);
+    else if (customer) setLoginOpen(true);
+    else openRegistration();
+  };
+  const login = ({ username, password }) => {
+    const validCredentials =
+      customer?.username === username && customer?.password === password;
+    if (!validCredentials) return false;
+    setIsLoggedIn(true);
+    sessionStorage.setItem("matcha-mori-session", "true");
+    setLoginOpen(false);
+    if (pendingCheckout) {
+      setPendingCheckout(false);
+      setSelectedProduct(null);
+      setCheckoutOpen(true);
+    } else {
+      setMemberOpen(true);
+    }
+    return true;
   };
   const scrollToProducts = () =>
     document.querySelector("#products")?.scrollIntoView({ behavior: "smooth" });
@@ -108,34 +149,86 @@ export default function App() {
         document
           .querySelector("#products")
           ?.scrollIntoView({ behavior: "smooth" }),
-      0,
+      0
     );
   };
   const returnHome = () => {
     setSelectedProduct(null);
     setCheckoutOpen(false);
     setMemberOpen(false);
+    setLoginOpen(false);
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
   };
   const navigateToSection = (selector) => {
     setSelectedProduct(null);
     setCheckoutOpen(false);
     setMemberOpen(false);
+    setLoginOpen(false);
     window.setTimeout(
       () =>
         document
           .querySelector(selector)
           ?.scrollIntoView({ behavior: "smooth" }),
-      0,
+      0
     );
   };
+  if (loginOpen)
+    return (
+      <>
+        <SiteHeader
+          onHome={returnHome}
+          onProducts={() => navigateToSection("#products")}
+          onStory={() => navigateToSection("#story")}
+          cartCount={cartCount}
+          onOpenCart={() => setCartOpen(true)}
+          onOpenAccount={openMemberPortal}
+          onLogin={() => setLoginOpen(true)}
+          onRegister={openRegistration}
+          customer={activeCustomer}
+        />
+        <LoginPage
+          customer={customer}
+          onBack={returnHome}
+          onLogin={login}
+          onRegister={openRegistration}
+        />
+        <SiteFooter />
+        <CustomerDialog
+          open={customerOpen}
+          onClose={() => setCustomerOpen(false)}
+          customer={customerDialogMode === "edit" ? customer : null}
+          onSave={saveCustomer}
+        />
+      </>
+    );
   if (memberOpen)
     return (
       <>
-        <SiteHeader onHome={returnHome} onProducts={() => navigateToSection("#products")} onStory={() => navigateToSection("#story")} cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onOpenAccount={openMemberPortal} customer={customer} />
-        <MemberDashboard customer={customer} orders={orders} onBack={returnHome} onSave={saveCustomer} onLogout={logout} />
+        <SiteHeader
+          onHome={returnHome}
+          onProducts={() => navigateToSection("#products")}
+          onStory={() => navigateToSection("#story")}
+          cartCount={cartCount}
+          onOpenCart={() => setCartOpen(true)}
+          onOpenAccount={openMemberPortal}
+          onLogin={() => setLoginOpen(true)}
+          onRegister={openRegistration}
+          customer={activeCustomer}
+        />
+        <MemberDashboard
+          customer={customer}
+          orders={orders}
+          onBack={returnHome}
+          onSave={saveCustomer}
+          onLogout={logout}
+        />
         <SiteFooter />
-        <CustomerDialog open={customerOpen} onClose={() => setCustomerOpen(false)} customer={customer} onSave={saveCustomer} />
+        <CustomerDialog
+          open={customerOpen}
+          onClose={() => setCustomerOpen(false)}
+          customer={customerDialogMode === "edit" ? customer : null}
+          onSave={saveCustomer}
+        />
       </>
     );
   if (checkoutOpen)
@@ -148,7 +241,9 @@ export default function App() {
           cartCount={cartCount}
           onOpenCart={() => setCartOpen(true)}
           onOpenAccount={openMemberPortal}
-          customer={customer}
+          onLogin={() => setLoginOpen(true)}
+          onRegister={openRegistration}
+          customer={activeCustomer}
         />
         <CheckoutPage
           cart={cart}
@@ -164,7 +259,7 @@ export default function App() {
         <CustomerDialog
           open={customerOpen}
           onClose={() => setCustomerOpen(false)}
-          customer={customer}
+          customer={customerDialogMode === "edit" ? customer : null}
           onSave={saveCustomer}
         />
         <AccountPanel
@@ -190,7 +285,9 @@ export default function App() {
           cartCount={cartCount}
           onOpenCart={() => setCartOpen(true)}
           onOpenAccount={openMemberPortal}
-          customer={customer}
+          onLogin={() => setLoginOpen(true)}
+          onRegister={openRegistration}
+          customer={activeCustomer}
         />
         <ProductDetails
           product={selectedProduct}
@@ -198,7 +295,7 @@ export default function App() {
           onAdd={addToCart}
           onBuyNow={buyNow}
           recommendation={products.find(
-            (item) => item.name !== selectedProduct.name,
+            (item) => item.name !== selectedProduct.name
           )}
         />
         <SiteFooter />
@@ -220,7 +317,7 @@ export default function App() {
         <CustomerDialog
           open={customerOpen}
           onClose={() => setCustomerOpen(false)}
-          customer={customer}
+          customer={customerDialogMode === "edit" ? customer : null}
           onSave={saveCustomer}
         />
         <AccountPanel
@@ -245,7 +342,9 @@ export default function App() {
         cartCount={cartCount}
         onOpenCart={() => setCartOpen(true)}
         onOpenAccount={openMemberPortal}
-        customer={customer}
+        onLogin={() => setLoginOpen(true)}
+        onRegister={openRegistration}
+        customer={activeCustomer}
       />
       <Box component="main">
         <Hero onShopClick={scrollToProducts} />
@@ -535,7 +634,7 @@ export default function App() {
       <CustomerDialog
         open={customerOpen}
         onClose={() => setCustomerOpen(false)}
-        customer={customer}
+        customer={customerDialogMode === "edit" ? customer : null}
         onSave={saveCustomer}
       />
       <AccountPanel

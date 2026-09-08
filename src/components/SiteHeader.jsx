@@ -9,7 +9,17 @@ import {
 } from "@mui/material";
 import { assetUrl } from "../utils/assets";
 
-export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onOpenCart, onOpenAccount, customer }) {
+export default function SiteHeader({
+  onHome,
+  onProducts,
+  onStory,
+  cartCount,
+  onOpenCart,
+  onOpenAccount,
+  onLogin,
+  onRegister,
+  customer,
+}) {
   const navSx = {
     color: "#183b2a",
     fontSize: { xs: 0, md: 17 },
@@ -40,7 +50,11 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
         sx={{ bgcolor: "#fffdf9", borderBottom: "1px solid #dcd3c2" }}
       >
         <Toolbar
-          sx={{ minHeight: { xs: 76, md: 108 }, px: { xs: 1.5, md: "8vw" }, gap: { xs: 1, md: 0 } }}
+          sx={{
+            minHeight: { xs: 76, md: 108 },
+            px: { xs: 1.5, md: "8vw" },
+            gap: { xs: 1, md: 0 },
+          }}
         >
           <Box
             component="a"
@@ -88,7 +102,12 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
           </Box>
           <Stack
             direction="row"
-            sx={{ flex: 1, justifyContent: "center", gap: 1, display: { xs: "none", md: "flex" } }}
+            sx={{
+              flex: 1,
+              justifyContent: "center",
+              gap: 1,
+              display: { xs: "none", md: "flex" },
+            }}
           >
             <Button
               href="#top"
@@ -100,10 +119,24 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
             >
               หน้าหลัก
             </Button>
-            <Button href="#products" onClick={(event) => { event.preventDefault(); onProducts?.(); }} sx={navSx}>
+            <Button
+              href="#products"
+              onClick={(event) => {
+                event.preventDefault();
+                onProducts?.();
+              }}
+              sx={navSx}
+            >
               สินค้าของเรา
             </Button>
-            <Button href="#story" onClick={(event) => { event.preventDefault(); onStory?.(); }} sx={navSx}>
+            <Button
+              href="#story"
+              onClick={(event) => {
+                event.preventDefault();
+                onStory?.();
+              }}
+              sx={navSx}
+            >
               เรื่องราวของเรา
             </Button>
           </Stack>
@@ -114,17 +147,39 @@ export default function SiteHeader({ onHome, onProducts, onStory, cartCount, onO
               justifyContent: "flex-end",
             }}
           >
-            <Button onClick={onOpenAccount} sx={{ color: "#183b2a", mr: { xs: 0, md: 1 }, px: { xs: .6, md: 1 }, fontSize: { xs: 12, md: 16 }, whiteSpace: "nowrap" }}>
-              {customer ? "บัญชีของฉัน" : "สมัครสมาชิก"}
+            <Button
+              onClick={customer ? onOpenAccount : onRegister}
+              sx={{
+                color: "#183b2a",
+                mr: { xs: 0, md: 1 },
+                px: { xs: 0.6, md: 1 },
+                fontSize: { xs: 12, md: 16 },
+                whiteSpace: "nowrap",
+              }}
+            >
+              {customer ? "บัญชีของฉัน" : "สมัคร"}
             </Button>
+            {!customer && (
+              <Button
+                onClick={onLogin}
+                sx={{
+                  color: "#183b2a",
+                  px: { xs: 0.6, md: 1 },
+                  fontSize: { xs: 12, md: 16 },
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Login
+              </Button>
+            )}
             <Button
               onClick={onOpenCart}
               variant="outlined"
               sx={{
                 borderColor: "#183b2a",
                 color: "#183b2a",
-                px: { xs: .8, md: 2 },
-                py: { xs: .75, md: 1 },
+                px: { xs: 0.8, md: 2 },
+                py: { xs: 0.75, md: 1 },
                 fontSize: { xs: 0, md: 16 },
               }}
             >

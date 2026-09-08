@@ -24,7 +24,7 @@ export default function CartDrawer({
   const priceOf = (price) => Number(String(price).replace(/,/g, ""));
   const subtotal = cart.reduce(
     (sum, item) => sum + priceOf(item.price) * item.quantity,
-    0,
+    0
   );
   const discount = couponApplied ? Math.round(subtotal * 0.12) : 0;
   const total = subtotal - discount;

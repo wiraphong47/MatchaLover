@@ -29,7 +29,7 @@ export default function PackageCollection({ packages, products, onAdd }) {
     setSelected(pack);
     setSelectedMatcha(
       products.find((product) => product.name === pack.defaultMatcha) ||
-        products[0],
+        products[0]
     );
   };
   return (
@@ -181,8 +181,8 @@ export default function PackageCollection({ packages, products, onAdd }) {
                 onChange={(event) =>
                   setSelectedMatcha(
                     products.find(
-                      (product) => product.name === event.target.value,
-                    ),
+                      (product) => product.name === event.target.value
+                    )
                   )
                 }
                 sx={{ mt: 2.5 }}
@@ -247,7 +247,7 @@ export default function PackageCollection({ packages, products, onAdd }) {
                   ประหยัด ฿
                   {formatPrice(
                     packPricing(selected, selectedMatcha).original -
-                      packPricing(selected, selectedMatcha).price,
+                      packPricing(selected, selectedMatcha).price
                   )}
                 </Typography>
               </Stack>

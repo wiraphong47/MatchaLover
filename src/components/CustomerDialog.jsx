@@ -1,9 +1,11 @@
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   Stack,
   TextField,
   Typography,
@@ -11,8 +13,11 @@ import {
 import { useEffect, useState } from "react";
 
 export default function CustomerDialog({ open, onClose, customer, onSave }) {
+  const needsCredentials = !customer?.username || !customer?.password;
   const [form, setForm] = useState({
     name: "",
+    username: "",
+    password: "",
     email: "",
     phone: "",
     address: "",
@@ -21,14 +26,28 @@ export default function CustomerDialog({ open, onClose, customer, onSave }) {
   useEffect(() => {
     if (open)
       setForm(
-        customer || { name: "", email: "", phone: "", address: "", note: "" },
+        customer || {
+          name: "",
+          username: "",
+          password: "",
+          email: "",
+          phone: "",
+          address: "",
+          note: "",
+          consent: false,
+        }
       );
   }, [open, customer]);
   const change = (key) => (event) =>
     setForm({ ...form, [key]: event.target.value });
   const submit = (event) => {
     event.preventDefault();
-    if (form.name && form.email && form.phone) {
+    if (
+      form.name &&
+      form.email &&
+      form.phone &&
+      (!needsCredentials || (form.username && form.password && form.consent))
+    ) {
       onSave(form);
       onClose();
     }
@@ -44,7 +63,7 @@ export default function CustomerDialog({ open, onClose, customer, onSave }) {
       <DialogTitle
         sx={{ fontFamily: "Pridi, serif", fontSize: 30, color: "#183b2a" }}
       >
-        {customer ? "ข้อมูลบัญชีของฉัน" : "สมัครสมาชิก Matcha Mori"}
+        {needsCredentials ? "สมัครสมาชิก Matcha Mori" : "ข้อมูลบัญชีของฉัน"}
       </DialogTitle>
       <DialogContent>
         <Typography sx={{ color: "#607159", mb: 2.5 }}>
@@ -52,6 +71,24 @@ export default function CustomerDialog({ open, onClose, customer, onSave }) {
           และรับคำแนะนำที่เหมาะกับคุณ
         </Typography>
         <Stack spacing={2}>
+          {needsCredentials && (
+            <TextField
+              required
+              label="ชื่อผู้ใช้สำหรับเข้าสู่ระบบ"
+              value={form.username}
+              onChange={change("username")}
+            />
+          )}
+          {needsCredentials && (
+            <TextField
+              required
+              type="password"
+              label="รหัสผ่าน"
+              value={form.password}
+              onChange={change("password")}
+              helperText="ใช้สำหรับเข้าสู่ระบบในครั้งถัดไป"
+            />
+          )}
           <TextField
             required
             label="ชื่อสำหรับจัดส่ง"
@@ -83,6 +120,20 @@ export default function CustomerDialog({ open, onClose, customer, onSave }) {
             value={form.note}
             onChange={change("note")}
           />
+          {needsCredentials && (
+            <FormControlLabel
+              required
+              control={
+                <Checkbox
+                  checked={Boolean(form.consent)}
+                  onChange={(event) =>
+                    setForm({ ...form, consent: event.target.checked })
+                  }
+                />
+              }
+              label="ฉันยินยอมให้ Matcha Mori เก็บข้อมูลเพื่อจัดการสมาชิกและคำสั่งซื้อ"
+            />
+          )}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 3 }}>

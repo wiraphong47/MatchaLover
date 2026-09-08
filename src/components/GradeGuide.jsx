@@ -44,46 +44,46 @@ export default function GradeGuide({ products }) {
             gap: 3.75,
           }}
         >
-        {visibleProducts.map((p, index) => (
-          <Box
-            key={p.name}
-            sx={{
-              display: "flex",
-              gap: 1.5,
-              pl: 2.25,
-              borderLeft: "1px solid rgba(247,241,223,.24)",
-            }}
-          >
-            <Typography
-              sx={{ color: "#d6c18e", fontWeight: 700, fontSize: 14 }}
+          {visibleProducts.map((p, index) => (
+            <Box
+              key={p.name}
+              sx={{
+                display: "flex",
+                gap: 1.5,
+                pl: 2.25,
+                borderLeft: "1px solid rgba(247,241,223,.24)",
+              }}
             >
-              0{index + 1}
-            </Typography>
-            <Box>
               <Typography
-                variant="h4"
-                sx={{ fontFamily: "Pridi, serif", fontSize: 23 }}
+                sx={{ color: "#d6c18e", fontWeight: 700, fontSize: 14 }}
               >
-                {p.name}
+                0{index + 1}
               </Typography>
-              <Typography
-                sx={{
-                  fontSize: 15,
-                  color: "#d8e0d0",
-                  lineHeight: 1.65,
-                  my: 0.5,
-                }}
-              >
-                {p.detail}
-              </Typography>
-              <Typography
-                sx={{ fontSize: 14, color: "#f3dc9b", fontWeight: 700 }}
-              >
-                เหมาะสำหรับ: {p.use}
-              </Typography>
+              <Box>
+                <Typography
+                  variant="h4"
+                  sx={{ fontFamily: "Pridi, serif", fontSize: 23 }}
+                >
+                  {p.name}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: 15,
+                    color: "#d8e0d0",
+                    lineHeight: 1.65,
+                    my: 0.5,
+                  }}
+                >
+                  {p.detail}
+                </Typography>
+                <Typography
+                  sx={{ fontSize: 14, color: "#f3dc9b", fontWeight: 700 }}
+                >
+                  เหมาะสำหรับ: {p.use}
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-        ))}
+          ))}
         </Box>
         {products.length > 3 && (
           <Button
@@ -93,10 +93,15 @@ export default function GradeGuide({ products }) {
               mt: 3.5,
               color: "#fdf9eb",
               borderColor: "#d6c18e",
-              "&:hover": { borderColor: "#f3dc9b", bgcolor: "rgba(255,255,255,.06)" },
+              "&:hover": {
+                borderColor: "#f3dc9b",
+                bgcolor: "rgba(255,255,255,.06)",
+              },
             }}
           >
-            {showAll ? "แสดงน้อยลง" : `แสดงเพิ่มเติม (${products.length - 3} รายการ)`}
+            {showAll
+              ? "แสดงน้อยลง"
+              : `แสดงเพิ่มเติม (${products.length - 3} รายการ)`}
           </Button>
         )}
       </Box>
