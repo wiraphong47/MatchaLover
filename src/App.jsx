@@ -1,82 +1,95 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import SiteHeader from "./components/SiteHeader";
-import Hero from "./components/Hero";
-import ProductCard from "./components/ProductCard";
-import GradeGuide from "./components/GradeGuide";
-import TrustFeatures from "./components/TrustFeatures";
-import ProductDetails from "./components/ProductDetails";
 import SiteFooter from "./components/SiteFooter";
-import CustomerDialog from "./components/CustomerDialog";
-import CartDrawer from "./components/CartDrawer";
-import AccountPanel from "./components/AccountPanel";
-import LoginPage from "./components/LoginPage";
-import MemberDashboard from "./components/MemberDashboard";
-import RecommendationQuiz from "./components/RecommendationQuiz";
-import PackageCollection from "./components/PackageCollection";
-import BrewTools from "./components/BrewTools";
-import CheckoutPage from "./components/CheckoutPage";
-import CatalogControls from "./components/CatalogControls";
-import Reviews from "./components/Reviews";
-import Faq from "./components/Faq";
 import { products } from "./data/products";
 import { brewTools, packages } from "./data/collections";
-import { assetUrl } from "./utils/assets";
-import { createMemberId } from "./utils/member";
 import useShop from "./hooks/useShop";
+import { createMemberId } from "./utils/member";
+import HomePage from "./pages/HomePage";
+import ProductDetailPage from "./pages/ProductDetailPage";
+import CartDrawer from "./components/CartDrawer";
+import CheckoutPage from "./pages/CheckoutPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterDialog from "./pages/RegisterDialog";
+import MemberPage from "./pages/MemberPage";
 
 export default function App() {
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const shop = useShop();
+  const [page, setPage] = useState("home");
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
-  const [customerOpen, setCustomerOpen] = useState(false);
-  const [customerDialogMode, setCustomerDialogMode] = useState("register");
-  const [accountOpen, setAccountOpen] = useState(false);
-  const [memberOpen, setMemberOpen] = useState(false);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(
     () => sessionStorage.getItem("matcha-mori-session") === "true"
   );
   const {
     addToCart,
+    addProductToCart,
     cart,
     cartCount,
     changeQuantity,
+    completeOrder,
     couponApplied,
     couponCode,
     customer,
     orders,
+    setCart,
     setCouponCode,
     setCustomer,
   } = shop;
-  const [category, setCategory] = useState("all");
-  const [query, setQuery] = useState("");
   const activeCustomer = isLoggedIn ? customer : null;
-  const matchesSearch = (item) =>
-    JSON.stringify(item).toLowerCase().includes(query.trim().toLowerCase());
-  const filteredProducts = products.filter(matchesSearch);
-  const filteredPackages = packages.filter(matchesSearch);
-  const filteredTools = brewTools.filter(matchesSearch);
-  const buyNow = (product) => {
-    shop.setCart(shop.addProductToCart(product));
-    if (!isLoggedIn) {
-      setPendingCheckout(true);
-      if (customer) setLoginOpen(true);
-      else openRegistration();
-      return;
-    }
+
+  const goTo = (nextPage) => {
     setSelectedProduct(null);
-    setCheckoutOpen(true);
+    setPage(nextPage);
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
+  };
+  const returnHome = () => goTo("home");
+  const scrollToSection = (id) => {
+    setSelectedProduct(null);
+    setPage("home");
+    window.setTimeout(
+      () =>
+        document
+          .querySelector(`#${id}`)
+          ?.scrollIntoView({ behavior: "smooth" }),
+      0
+    );
+  };
+  const openRegistration = () => setRegisterOpen(true);
+  const openMemberPortal = () => {
+    if (isLoggedIn) goTo("member");
+    else if (customer) goTo("login");
+    else openRegistration();
   };
   const openProduct = (product) => {
     setSelectedProduct(product);
+    setPage("product-detail");
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
   };
+  const buyNow = (product) => {
+    setCart(addProductToCart(product));
+    if (!isLoggedIn) {
+      setPendingCheckout(true);
+      if (customer) goTo("login");
+      else openRegistration();
+      return;
+    }
+    goTo("checkout");
+  };
+  const startCheckout = () => {
+    if (!isLoggedIn) {
+      setCartOpen(false);
+      if (customer) goTo("login");
+      else openRegistration();
+      return;
+    }
+    setCartOpen(false);
+    goTo("checkout");
+  };
   const saveCustomer = (profile) => {
-    shop.setCustomer({
+    setCustomer({
       ...profile,
       memberId: profile.memberId || createMemberId(profile),
     });
@@ -84,537 +97,103 @@ export default function App() {
     sessionStorage.setItem("matcha-mori-session", "true");
     if (pendingCheckout) {
       setPendingCheckout(false);
-      setSelectedProduct(null);
-      setCheckoutOpen(true);
-      window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
+      goTo("checkout");
     }
   };
-  const startCheckout = () => {
-    if (!isLoggedIn) {
-      setCartOpen(false);
-      if (customer) setLoginOpen(true);
-      else openRegistration();
-      return;
-    }
-    setCartOpen(false);
-    setCheckoutOpen(true);
-  };
-  const confirmCheckout = (payment) => {
-    shop.completeOrder({ ...payment, customer });
-    setCartOpen(false);
-    setMemberOpen(true);
-    setCheckoutOpen(false);
+  const login = ({ username, password }) => {
+    if (customer?.username !== username || customer?.password !== password)
+      return false;
+    setIsLoggedIn(true);
+    sessionStorage.setItem("matcha-mori-session", "true");
+    if (pendingCheckout) {
+      setPendingCheckout(false);
+      goTo("checkout");
+    } else goTo("member");
+    return true;
   };
   const logout = () => {
     setIsLoggedIn(false);
     sessionStorage.removeItem("matcha-mori-session");
-    setAccountOpen(false);
-    setMemberOpen(false);
+    goTo("home");
   };
-  const openRegistration = () => {
-    setCustomerDialogMode("register");
-    setCustomerOpen(true);
+  const confirmCheckout = (payment) => {
+    completeOrder({ ...payment, customer });
+    goTo("member");
   };
-  const openCustomerEdit = () => {
-    setCustomerDialogMode("edit");
-    setCustomerOpen(true);
-  };
-  const openMemberPortal = () => {
-    if (isLoggedIn) setMemberOpen(true);
-    else if (customer) setLoginOpen(true);
-    else openRegistration();
-  };
-  const login = ({ username, password }) => {
-    const validCredentials =
-      customer?.username === username && customer?.password === password;
-    if (!validCredentials) return false;
-    setIsLoggedIn(true);
-    sessionStorage.setItem("matcha-mori-session", "true");
-    setLoginOpen(false);
-    if (pendingCheckout) {
-      setPendingCheckout(false);
-      setSelectedProduct(null);
-      setCheckoutOpen(true);
-    } else {
-      setMemberOpen(true);
-    }
-    return true;
-  };
-  const scrollToProducts = () =>
-    document.querySelector("#products")?.scrollIntoView({ behavior: "smooth" });
-  const returnToProducts = () => {
-    setSelectedProduct(null);
-    window.setTimeout(
-      () =>
-        document
-          .querySelector("#products")
-          ?.scrollIntoView({ behavior: "smooth" }),
-      0
-    );
-  };
-  const returnHome = () => {
-    setSelectedProduct(null);
-    setCheckoutOpen(false);
-    setMemberOpen(false);
-    setLoginOpen(false);
-    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
-  };
-  const navigateToSection = (selector) => {
-    setSelectedProduct(null);
-    setCheckoutOpen(false);
-    setMemberOpen(false);
-    setLoginOpen(false);
-    window.setTimeout(
-      () =>
-        document
-          .querySelector(selector)
-          ?.scrollIntoView({ behavior: "smooth" }),
-      0
-    );
-  };
-  if (loginOpen)
-    return (
-      <>
-        <SiteHeader
-          onHome={returnHome}
-          onProducts={() => navigateToSection("#products")}
-          onStory={() => navigateToSection("#story")}
-          cartCount={cartCount}
-          onOpenCart={() => setCartOpen(true)}
-          onOpenAccount={openMemberPortal}
-          onLogin={() => setLoginOpen(true)}
-          onRegister={openRegistration}
-          customer={activeCustomer}
-        />
-        <LoginPage
-          customer={customer}
-          onBack={returnHome}
-          onLogin={login}
-          onRegister={openRegistration}
-        />
-        <SiteFooter />
-        <CustomerDialog
-          open={customerOpen}
-          onClose={() => setCustomerOpen(false)}
-          customer={customerDialogMode === "edit" ? customer : null}
-          onSave={saveCustomer}
-        />
-      </>
-    );
-  if (memberOpen)
-    return (
-      <>
-        <SiteHeader
-          onHome={returnHome}
-          onProducts={() => navigateToSection("#products")}
-          onStory={() => navigateToSection("#story")}
-          cartCount={cartCount}
-          onOpenCart={() => setCartOpen(true)}
-          onOpenAccount={openMemberPortal}
-          onLogin={() => setLoginOpen(true)}
-          onRegister={openRegistration}
-          customer={activeCustomer}
-        />
-        <MemberDashboard
-          customer={customer}
-          orders={orders}
-          onBack={returnHome}
-          onSave={saveCustomer}
-          onLogout={logout}
-        />
-        <SiteFooter />
-        <CustomerDialog
-          open={customerOpen}
-          onClose={() => setCustomerOpen(false)}
-          customer={customerDialogMode === "edit" ? customer : null}
-          onSave={saveCustomer}
-        />
-      </>
-    );
-  if (checkoutOpen)
-    return (
-      <>
-        <SiteHeader
-          onHome={returnHome}
-          onProducts={() => navigateToSection("#products")}
-          onStory={() => navigateToSection("#story")}
-          cartCount={cartCount}
-          onOpenCart={() => setCartOpen(true)}
-          onOpenAccount={openMemberPortal}
-          onLogin={() => setLoginOpen(true)}
-          onRegister={openRegistration}
-          customer={activeCustomer}
-        />
-        <CheckoutPage
-          cart={cart}
-          customer={customer}
-          couponApplied={couponApplied}
-          onBack={() => {
-            setCheckoutOpen(false);
-            setCartOpen(true);
-          }}
-          onConfirm={confirmCheckout}
-        />
-        <SiteFooter />
-        <CustomerDialog
-          open={customerOpen}
-          onClose={() => setCustomerOpen(false)}
-          customer={customerDialogMode === "edit" ? customer : null}
-          onSave={saveCustomer}
-        />
-        <AccountPanel
-          open={accountOpen}
-          onClose={() => setAccountOpen(false)}
-          customer={customer}
-          orders={orders}
-          onEdit={() => {
-            setAccountOpen(false);
-            setCustomerOpen(true);
-          }}
-          onLogout={logout}
-        />
-      </>
-    );
-  if (selectedProduct)
-    return (
-      <>
-        <SiteHeader
-          onHome={returnHome}
-          onProducts={() => navigateToSection("#products")}
-          onStory={() => navigateToSection("#story")}
-          cartCount={cartCount}
-          onOpenCart={() => setCartOpen(true)}
-          onOpenAccount={openMemberPortal}
-          onLogin={() => setLoginOpen(true)}
-          onRegister={openRegistration}
-          customer={activeCustomer}
-        />
-        <ProductDetails
+  const content = (() => {
+    if (page === "product-detail" && selectedProduct)
+      return (
+        <ProductDetailPage
           product={selectedProduct}
-          onBack={returnToProducts}
+          onBack={() => scrollToSection("products")}
           onAdd={addToCart}
           onBuyNow={buyNow}
           recommendation={products.find(
             (item) => item.name !== selectedProduct.name
           )}
         />
-        <SiteFooter />
-        <CartDrawer
-          open={cartOpen}
-          onClose={() => setCartOpen(false)}
-          cart={cart}
-          onChangeQuantity={changeQuantity}
-          onCheckout={startCheckout}
-          customer={customer}
-          onOpenAccount={() => {
-            setCartOpen(false);
-            setCustomerOpen(true);
-          }}
-          couponCode={couponCode}
-          onCouponChange={setCouponCode}
-          couponApplied={couponApplied}
-        />
-        <CustomerDialog
-          open={customerOpen}
-          onClose={() => setCustomerOpen(false)}
-          customer={customerDialogMode === "edit" ? customer : null}
-          onSave={saveCustomer}
-        />
-        <AccountPanel
-          open={accountOpen}
-          onClose={() => setAccountOpen(false)}
-          customer={customer}
-          orders={orders}
-          onEdit={() => {
-            setAccountOpen(false);
-            setCustomerOpen(true);
-          }}
-          onLogout={logout}
-        />
-      </>
-    );
+      );
+    switch (page) {
+      case "checkout":
+        return (
+          <CheckoutPage
+            cart={cart}
+            customer={customer}
+            couponApplied={couponApplied}
+            onBack={() => {
+              scrollToSection("products");
+              setCartOpen(true);
+            }}
+            onConfirm={confirmCheckout}
+          />
+        );
+      case "login":
+        return (
+          <LoginPage
+            customer={customer}
+            onBack={returnHome}
+            onLogin={login}
+            onRegister={openRegistration}
+          />
+        );
+      case "member":
+        return (
+          <MemberPage
+            customer={customer}
+            orders={orders}
+            onBack={returnHome}
+            onSave={saveCustomer}
+            onLogout={logout}
+          />
+        );
+      default:
+        return (
+          <HomePage
+            products={products}
+            packages={packages}
+            tools={brewTools}
+            onAdd={addToCart}
+            onOpenProduct={openProduct}
+            onScrollTo={scrollToSection}
+          />
+        );
+    }
+  })();
+
   return (
     <>
       <SiteHeader
         onHome={returnHome}
-        onProducts={() => navigateToSection("#products")}
-        onStory={() => navigateToSection("#story")}
+        onProducts={() => scrollToSection("products")}
+        onStory={() => scrollToSection("story")}
         cartCount={cartCount}
         onOpenCart={() => setCartOpen(true)}
         onOpenAccount={openMemberPortal}
-        onLogin={() => setLoginOpen(true)}
+        onLogin={() => goTo("login")}
         onRegister={openRegistration}
         customer={activeCustomer}
       />
-      <Box component="main">
-        <Hero onShopClick={scrollToProducts} />
-        <Box
-          component="section"
-          id="story"
-          sx={{
-            maxWidth: 760,
-            mx: "auto",
-
-            pb: { xs: 4, md: 4 },
-            px: 2.5,
-            textAlign: "center",
-          }}
-        >
-          <Typography
-            sx={{
-              color: "#6c815e",
-              fontSize: 13,
-              letterSpacing: ".18em",
-              fontWeight: 700,
-              mt: 2,
-            }}
-          >
-            THE MATCHA MORI PHILOSOPHY
-          </Typography>
-          <Typography
-            variant="h2"
-            sx={{
-              fontSize: { xs: 40, md: 52 },
-              mt: 2,
-              fontFamily: '"Noto Sans Thai", sans-serif',
-              fontWeight: 700,
-            }}
-          >
-            มัทฉะแท้{" "}
-            <Box
-              component="em"
-              sx={{
-                color: "#547d3b",
-                fontStyle: "normal",
-                fontFamily: '"Noto Sans Thai", sans-serif',
-              }}
-            >
-              คุณภาพพรีเมียม
-            </Box>
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: { xs: 18, md: 19 },
-              lineHeight: 2,
-              color: "#536154",
-              mt: 3,
-              maxWidth: 610,
-              mx: "auto",
-              mb: 3,
-            }}
-          >
-            เราคัดสรรใบชาสีเขียวสดจากแหล่งปลูกชั้นดีในญี่ปุ่น
-            บดอย่างพิถีพิถันด้วยหินแกรนิต เพื่อรักษากลิ่นหอม รสอูมามิ
-            และสีเขียวที่งดงามตามธรรมชาติไว้ในทุกคำ
-          </Typography>
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            justifyContent="space-between"
-            spacing={1.5}
-            sx={{
-              mt: 3,
-              pt: 2.75,
-              borderTop: "1px solid #dcd3c2",
-              textAlign: { xs: "left", md: "center" },
-            }}
-          >
-            {[
-              "คัดจากแหล่งปลูกชั้นดี",
-              "บดด้วยหินแบบดั้งเดิม",
-              "สดใหม่ในทุกซอง",
-            ].map((text, i) => (
-              <Typography key={text} sx={{ fontSize: 16, color: "#526253" }}>
-                <Box component="b" sx={{ color: "#a8874b", mr: 1 }}>
-                  0{i + 1}
-                </Box>
-                {text}
-              </Typography>
-            ))}
-          </Stack>
-        </Box>
-        <TrustFeatures />
-        <Box
-          component="section"
-          id="products"
-          sx={{
-            pt: { xs: 7, md: 9 },
-            pb: query.trim() ? 0 : { xs: 7, md: 9 },
-            px: { xs: 2.5, md: "8vw" },
-            bgcolor: "#ece7db",
-          }}
-        >
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="end"
-            sx={{ mb: 6.5 }}
-          >
-            <Box>
-              <Typography
-                sx={{
-                  color: "#6c815e",
-                  fontSize: 13,
-                  letterSpacing: ".18em",
-                  fontWeight: 700,
-                  mb: 1,
-                }}
-              >
-                OUR COLLECTION
-              </Typography>
-              <Typography
-                variant="h2"
-                sx={{ fontSize: { xs: 38, md: 52 }, lineHeight: 1.15, mt: 1 }}
-              >
-                เลือกมัทฉะ
-                <br />
-                <Box
-                  component="em"
-                  sx={{ color: "#547d3b", fontStyle: "normal" }}
-                >
-                  ที่ใช่สำหรับคุณ
-                </Box>
-              </Typography>
-            </Box>
-            <Button
-              href="#products"
-              sx={{
-                display: { xs: "none", md: "inline-flex" },
-                color: "#183b2a",
-                fontSize: 16,
-                borderBottom: "1px solid #183b2a",
-                borderRadius: 0,
-              }}
-            >
-              ดูสินค้าทั้งหมด →
-            </Button>
-          </Stack>
-          <CatalogControls
-            category={category}
-            onCategoryChange={setCategory}
-            query={query}
-            onQueryChange={setQuery}
-          />
-          {(category === "all" || category === "matcha") && (
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "repeat(3,1fr)" },
-                gap: 2.5,
-              }}
-            >
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.name}
-                  product={product}
-                  onView={openProduct}
-                  onAdd={addToCart}
-                />
-              ))}
-            </Box>
-          )}
-          {!query.trim() && (category === "all" || category === "matcha") && (
-            <>
-              <RecommendationQuiz
-                products={products}
-                onAdd={addToCart}
-                onView={openProduct}
-              />
-              <GradeGuide products={products} />
-            </>
-          )}
-        </Box>
-        {(category === "all" || category === "package") &&
-          filteredPackages.length > 0 && (
-            <PackageCollection
-              packages={filteredPackages}
-              products={products}
-              onAdd={addToCart}
-            />
-          )}
-        {(category === "all" || category === "tools") &&
-          filteredTools.length > 0 && (
-            <BrewTools tools={filteredTools} onAdd={addToCart} />
-          )}
-        {!query.trim() && (
-          <>
-            <Reviews />
-            <Faq />
-          </>
-        )}
-        <Box
-          component="section"
-          sx={{
-            minHeight: 440,
-            color: "#fff",
-            px: { xs: 3.5, md: "13vw" },
-            py: 10,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: `linear-gradient(90deg,rgba(24,59,42,.94),rgba(24,59,42,.55)), url(${assetUrl("uji-matcha.jpg")}) center / cover`,
-          }}
-        >
-          <Box>
-            <Typography
-              sx={{
-                color: "#d6dfac",
-                fontSize: 13,
-                letterSpacing: ".18em",
-                fontWeight: 700,
-              }}
-            >
-              A DAILY RITUAL
-            </Typography>
-            <Typography
-              variant="h2"
-              sx={{
-                fontSize: { xs: 40, md: 52 },
-                lineHeight: 1.15,
-                mt: 2,
-                mb: 3,
-              }}
-            >
-              ให้ทุกวัน
-              <br />
-              เริ่มต้นอย่าง{" "}
-              <Box
-                component="em"
-                sx={{ color: "#f1e4c2", fontStyle: "normal" }}
-              >
-                ละเมียดละไม
-              </Box>
-            </Typography>
-            <Button
-              onClick={scrollToProducts}
-              variant="contained"
-              disableElevation
-              sx={{
-                bgcolor: "#efe2bd",
-                color: "#183b2a",
-                fontSize: 16,
-                "&:hover": { bgcolor: "#e5d5ab" },
-              }}
-            >
-              ช้อปคอลเลกชัน →
-            </Button>
-          </Box>
-          <Typography
-            sx={{
-              display: { xs: "none", md: "block" },
-              fontFamily: "Pridi, serif",
-              fontSize: 27,
-              textAlign: "right",
-              color: "#f3e6ba",
-            }}
-          >
-            Take a moment.
-            <br />
-            Whisk slowly.
-            <br />
-            Savor deeply.
-          </Typography>
-        </Box>
-      </Box>
+      {content}
       <SiteFooter />
       <CartDrawer
         open={cartOpen}
@@ -622,31 +201,17 @@ export default function App() {
         cart={cart}
         onChangeQuantity={changeQuantity}
         onCheckout={startCheckout}
-        customer={customer}
-        onOpenAccount={() => {
-          setCartOpen(false);
-          setCustomerOpen(true);
-        }}
+        customer={activeCustomer}
+        onOpenAccount={openMemberPortal}
         couponCode={couponCode}
         onCouponChange={setCouponCode}
         couponApplied={couponApplied}
       />
-      <CustomerDialog
-        open={customerOpen}
-        onClose={() => setCustomerOpen(false)}
-        customer={customerDialogMode === "edit" ? customer : null}
+      <RegisterDialog
+        open={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        customer={null}
         onSave={saveCustomer}
-      />
-      <AccountPanel
-        open={accountOpen}
-        onClose={() => setAccountOpen(false)}
-        customer={customer}
-        orders={orders}
-        onEdit={() => {
-          setAccountOpen(false);
-          setCustomerOpen(true);
-        }}
-        onLogout={logout}
       />
     </>
   );

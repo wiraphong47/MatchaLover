@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { assetUrl } from "../utils/assets";
+import PackageCard from "./PackageCard";
 
 const priceOf = (price) => Number(String(price).replace(/,/g, ""));
 const formatPrice = (price) => price.toLocaleString("en-US");
@@ -67,71 +68,7 @@ export default function PackageCollection({ packages, products, onAdd }) {
           }}
         >
           {packages.map((pack) => (
-            <Box
-              key={pack.name}
-              sx={{
-                border: "1px solid #dcd3c2",
-                bgcolor: "#f5f0e5",
-                overflow: "hidden",
-              }}
-            >
-              <Box
-                component="img"
-                src={assetUrl(pack.image)}
-                alt={pack.name}
-                sx={{
-                  width: "100%",
-                  height: 230,
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
-              <Box sx={{ p: 3 }}>
-                <Typography
-                  sx={{
-                    color: "#a8874b",
-                    fontWeight: 700,
-                    letterSpacing: ".1em",
-                    fontSize: 12,
-                  }}
-                >
-                  CURATED PACKAGE
-                </Typography>
-                <Typography variant="h3" sx={{ fontSize: 27, mt: 0.8 }}>
-                  {pack.name}
-                </Typography>
-                <Typography sx={{ color: "#607159", mt: 0.5, minHeight: 52 }}>
-                  {pack.subtitle}
-                </Typography>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  sx={{ mt: 2 }}
-                >
-                  <Box>
-                    <Typography
-                      sx={{
-                        color: "#8b8b81",
-                        fontSize: 13,
-                        textDecoration: "line-through",
-                      }}
-                    >
-                      ปกติ ฿{pack.originalPrice}
-                    </Typography>
-                    <Typography sx={{ fontWeight: 700, fontSize: 21 }}>
-                      ฿{pack.price}
-                    </Typography>
-                  </Box>
-                  <Button
-                    onClick={() => openPackage(pack)}
-                    sx={{ color: "#183b2a" }}
-                  >
-                    ดูในแพ็ก →
-                  </Button>
-                </Stack>
-              </Box>
-            </Box>
+            <PackageCard key={pack.name} pack={pack} onView={openPackage} />
           ))}
         </Box>
       </Box>
