@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "api": "C:/php/php.exe -S 127.0.0.1:8080 -t server-php/public",
+    "mail": "C:/php/php.exe server-php/worker.php",
+    "mail:watch": "C:/php/php.exe server-php/watch-worker.php",
+    "email:catalog": "node scripts/email-catalog.mjs",
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",

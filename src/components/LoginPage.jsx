@@ -1,14 +1,14 @@
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import useAsyncAction from "../hooks/useAsyncAction";
 
 export default function LoginPage({ customer, onBack, onLogin, onRegister }) {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const { run, busy, error } = useAsyncAction(onLogin);
   const submit = (event) => {
     event.preventDefault();
-    if (!onLogin({ username, password }))
-      setError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+    run({ email, password });
   };
   return (
     <Box
@@ -55,9 +55,10 @@ export default function LoginPage({ customer, onBack, onLogin, onRegister }) {
         <Stack spacing={2} sx={{ mt: 3 }}>
           <TextField
             required
-            label="ชื่อผู้ใช้"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
+            label="อีเมล"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             autoComplete="username"
           />
           <TextField
@@ -69,18 +70,19 @@ export default function LoginPage({ customer, onBack, onLogin, onRegister }) {
             autoComplete="current-password"
           />
           {error && (
-            <Typography sx={{ color: "#a34c3b", fontSize: 14 }}>
+            <Typography role="alert" sx={{ color: "#a34c3b", fontSize: 14 }}>
               {error}
             </Typography>
           )}
           <Button
             type="submit"
+            disabled={busy}
             variant="contained"
             disableElevation
             fullWidth
             sx={{ py: 1.4 }}
           >
-            เข้าสู่ระบบ
+            {busy ? "กำลังเข้าสู่ระบบ…" : "เข้าสู่ระบบ"}
           </Button>
         </Stack>
         <Typography sx={{ color: "#607159", textAlign: "center", mt: 3 }}>
@@ -93,7 +95,7 @@ export default function LoginPage({ customer, onBack, onLogin, onRegister }) {
           <Typography
             sx={{ color: "#607159", fontSize: 13, textAlign: "center", mt: 1 }}
           >
-            กรุณาเข้าสู่ระบบด้วยชื่อผู้ใช้ที่สมัครไว้
+            กรุณาเข้าสู่ระบบด้วยอีเมลที่สมัครไว้
           </Typography>
         )}
       </Box>

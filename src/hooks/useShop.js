@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 
 const STORAGE_KEYS = {
   cart: "matcha-mori-cart",
-  customer: "matcha-mori-customer",
   orders: "matcha-mori-orders",
 };
 
@@ -18,9 +17,6 @@ export default function useShop() {
   const [cart, setCart] = useState(() =>
     readStoredValue(STORAGE_KEYS.cart, [])
   );
-  const [customer, setCustomer] = useState(() =>
-    readStoredValue(STORAGE_KEYS.customer, null)
-  );
   const [orders, setOrders] = useState(() =>
     readStoredValue(STORAGE_KEYS.orders, [])
   );
@@ -29,10 +25,6 @@ export default function useShop() {
   useEffect(
     () => localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(cart)),
     [cart]
-  );
-  useEffect(
-    () => localStorage.setItem(STORAGE_KEYS.customer, JSON.stringify(customer)),
-    [customer]
   );
   useEffect(
     () => localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(orders)),
@@ -106,8 +98,6 @@ export default function useShop() {
     setCouponCode("");
   };
 
-  const logout = () => setCustomer(null);
-
   return {
     addProductToCart,
     addToCart,
@@ -117,11 +107,8 @@ export default function useShop() {
     completeOrder,
     couponApplied,
     couponCode,
-    customer,
-    logout,
     orders,
     setCart,
     setCouponCode,
-    setCustomer,
   };
 }

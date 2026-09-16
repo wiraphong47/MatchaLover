@@ -4,7 +4,9 @@ import SiteFooter from "./components/SiteFooter";
 import { products } from "./data/products";
 import { brewTools, packages } from "./data/collections";
 import useShop from "./hooks/useShop";
-import { createMemberId } from "./utils/member";
+import useMemberAuth from "./hooks/useMemberAuth";
+import { authMessage } from "./services/memberService";
+import { Alert, Box, Button, CircularProgress } from "@mui/material";
 import HomePage from "./pages/HomePage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartDrawer from "./components/CartDrawer";
@@ -15,14 +17,14 @@ import MemberPage from "./pages/MemberPage";
 
 export default function App() {
   const shop = useShop();
+  const auth = useMemberAuth();
+  const { customer, isLoggedIn } = auth;
+  const [notice, setNotice] = useState(null);
   const [page, setPage] = useState("home");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    () => sessionStorage.getItem("matcha-mori-session") === "true"
-  );
   const {
     addToCart,
     addProductToCart,
@@ -32,11 +34,9 @@ export default function App() {
     completeOrder,
     couponApplied,
     couponCode,
-    customer,
     orders,
     setCart,
     setCouponCode,
-    setCustomer,
   } = shop;
   const activeCustomer = isLoggedIn ? customer : null;
 
@@ -60,8 +60,7 @@ export default function App() {
   const openRegistration = () => setRegisterOpen(true);
   const openMemberPortal = () => {
     if (isLoggedIn) goTo("member");
-    else if (customer) goTo("login");
-    else openRegistration();
+    else goTo("login");
   };
   const openProduct = (product) => {
     setSelectedProduct(product);
@@ -72,8 +71,7 @@ export default function App() {
     setCart(addProductToCart(product));
     if (!isLoggedIn) {
       setPendingCheckout(true);
-      if (customer) goTo("login");
-      else openRegistration();
+      goTo("login");
       return;
     }
     goTo("checkout");
@@ -81,46 +79,79 @@ export default function App() {
   const startCheckout = () => {
     if (!isLoggedIn) {
       setCartOpen(false);
-      if (customer) goTo("login");
-      else openRegistration();
+      setPendingCheckout(true);
+      goTo("login");
       return;
     }
     setCartOpen(false);
     goTo("checkout");
   };
-  const saveCustomer = (profile) => {
-    setCustomer({
-      ...profile,
-      memberId: profile.memberId || createMemberId(profile),
+  const register = async (profile) => {
+    const result = await auth.register(profile);
+    setRegisterOpen(false);
+    setNotice({
+      severity: result.emailSent ? "success" : "warning",
+      text: result.emailSent
+        ? "สมัครสมาชิกสำเร็จและส่งอีเมลต้อนรับแล้ว"
+        : "สมัครสมาชิกสำเร็จ แต่ยังส่งอีเมลต้อนรับไม่ได้",
     });
-    setIsLoggedIn(true);
-    sessionStorage.setItem("matcha-mori-session", "true");
-    if (pendingCheckout) {
-      setPendingCheckout(false);
-      goTo("checkout");
-    }
-  };
-  const login = ({ username, password }) => {
-    if (customer?.username !== username || customer?.password !== password)
-      return false;
-    setIsLoggedIn(true);
-    sessionStorage.setItem("matcha-mori-session", "true");
     if (pendingCheckout) {
       setPendingCheckout(false);
       goTo("checkout");
     } else goTo("member");
-    return true;
   };
-  const logout = () => {
-    setIsLoggedIn(false);
-    sessionStorage.removeItem("matcha-mori-session");
-    goTo("home");
+  const login = async (credentials) => {
+    await auth.login(credentials);
+    setNotice(null);
+    if (pendingCheckout) {
+      setPendingCheckout(false);
+      goTo("checkout");
+    } else goTo("member");
+  };
+  const logout = async () => {
+    try {
+      await auth.logout();
+      setPendingCheckout(false);
+      goTo("home");
+    } catch (error) {
+      setNotice({ severity: "error", text: authMessage(error) });
+    }
   };
   const confirmCheckout = (payment) => {
+    if (!isLoggedIn || !customer) {
+      goTo("login");
+      return;
+    }
     completeOrder({ ...payment, customer });
     goTo("member");
   };
   const content = (() => {
+    if (["member", "checkout"].includes(page)) {
+      if (auth.loading)
+        return (
+          <Box sx={{ p: 6, textAlign: "center" }}>
+            <CircularProgress aria-label="กำลังโหลดบัญชี" />
+          </Box>
+        );
+      if (!isLoggedIn)
+        return (
+          <LoginPage
+            onBack={returnHome}
+            onLogin={login}
+            onRegister={openRegistration}
+          />
+        );
+      if (!customer)
+        return (
+          <Alert
+            severity="error"
+            sx={{ m: 3 }}
+            action={<Button onClick={logout}>ออกจากระบบ</Button>}
+          >
+            โหลดข้อมูลสมาชิกไม่สำเร็จ กรุณารีเฟรชหน้าเว็บแล้วลองใหม่
+          </Alert>
+        );
+    }
     if (page === "product-detail" && selectedProduct)
       return (
         <ProductDetailPage
@@ -162,13 +193,15 @@ export default function App() {
             customer={customer}
             orders={orders}
             onBack={returnHome}
-            onSave={saveCustomer}
+            onSave={auth.save}
             onLogout={logout}
           />
         );
       default:
         return (
           <HomePage
+            onSavePreferences={auth.save}
+            customer={activeCustomer}
             products={products}
             packages={packages}
             tools={brewTools}
@@ -193,6 +226,12 @@ export default function App() {
         onRegister={openRegistration}
         customer={activeCustomer}
       />
+      {notice && (
+        <Alert severity={notice.severity} onClose={() => setNotice(null)}>
+          {notice.text}
+        </Alert>
+      )}
+      {auth.error && <Alert severity="error">{auth.error}</Alert>}
       {content}
       <SiteFooter />
       <CartDrawer
@@ -211,7 +250,7 @@ export default function App() {
         open={registerOpen}
         onClose={() => setRegisterOpen(false)}
         customer={null}
-        onSave={saveCustomer}
+        onSave={register}
       />
     </>
   );

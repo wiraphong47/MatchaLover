@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { memberIdFor } from "../utils/member";
+import useAsyncAction from "../hooks/useAsyncAction";
 
 const money = (amount) => `฿${Number(amount || 0).toLocaleString("th-TH")}`;
 
@@ -21,12 +22,12 @@ export default function MemberDashboard({
 }) {
   const [tab, setTab] = useState("profile");
   const [editing, setEditing] = useState(false);
+  const { run, busy, error } = useAsyncAction(onSave);
   const [form, setForm] = useState(customer);
   useEffect(() => setForm(customer), [customer]);
   const memberId = memberIdFor(customer);
   const memberOrders = useMemo(
-    () =>
-      orders.filter((order) => !order.memberId || order.memberId === memberId),
+    () => orders.filter((order) => order.memberId === memberId),
     [orders, memberId]
   );
   const totalSpent = useMemo(
@@ -44,9 +45,8 @@ export default function MemberDashboard({
   ];
   const updateField = (field) => (event) =>
     setForm({ ...form, [field]: event.target.value });
-  const saveProfile = () => {
-    onSave(form);
-    setEditing(false);
+  const saveProfile = async () => {
+    if (await run(form)) setEditing(false);
   };
 
   return (
@@ -214,6 +214,7 @@ export default function MemberDashboard({
                   {editing ? (
                     <Stack direction="row" spacing={0.5}>
                       <Button
+                        disabled={busy}
                         onClick={() => {
                           setForm(customer);
                           setEditing(false);
@@ -223,11 +224,12 @@ export default function MemberDashboard({
                         ยกเลิก
                       </Button>
                       <Button
+                        disabled={busy}
                         onClick={saveProfile}
                         variant="contained"
                         disableElevation
                       >
-                        บันทึก
+                        {busy ? "กำลังบันทึก…" : "บันทึก"}
                       </Button>
                     </Stack>
                   ) : (
@@ -238,6 +240,11 @@ export default function MemberDashboard({
                 </Stack>
                 {editing ? (
                   <Stack spacing={1.7} sx={{ mt: 2.5 }}>
+                    {error && (
+                      <Typography role="alert" color="error">
+                        {error}
+                      </Typography>
+                    )}
                     <TextField
                       label="ชื่อสำหรับจัดส่ง"
                       value={form?.name || ""}
@@ -246,6 +253,8 @@ export default function MemberDashboard({
                     />
                     <TextField
                       label="อีเมล"
+                      helperText="อีเมลสำหรับเข้าสู่ระบบ (ยังไม่รองรับการเปลี่ยนอีเมลในหน้านี้)"
+                      InputProps={{ readOnly: true }}
                       type="email"
                       value={form?.email || ""}
                       onChange={updateField("email")}

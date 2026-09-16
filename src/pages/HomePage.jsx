@@ -7,7 +7,10 @@ import GradeGuide from "../components/GradeGuide";
 import Hero from "../components/Hero";
 import PackageCollection from "../components/PackageCollection";
 import ProductCard from "../components/ProductCard";
-import RecommendationQuiz from "../components/RecommendationQuiz";
+import RecommendationQuiz from "../components/PersonalizedRecommendations";
+import NewsletterSignup from "../components/NewsletterSignup";
+import useNewsletter from "../hooks/useNewsletter";
+import useRecommendations from "../hooks/useRecommendations";
 import Reviews from "../components/Reviews";
 import TrustFeatures from "../components/TrustFeatures";
 
@@ -18,7 +21,15 @@ export default function HomePage({
   onAdd,
   onOpenProduct,
   onScrollTo,
+  customer,
+  onSavePreferences,
 }) {
+  const newsletter = useNewsletter();
+  const recommendation = useRecommendations(
+    products,
+    customer,
+    onSavePreferences
+  );
   const [category, setCategory] = useState("all");
   const [query, setQuery] = useState("");
   const matchesSearch = (item) =>
@@ -137,7 +148,7 @@ export default function HomePage({
         )}
         {!isSearching && (category === "all" || category === "matcha") && (
           <RecommendationQuiz
-            products={products}
+            {...recommendation}
             onAdd={onAdd}
             onView={onOpenProduct}
           />
@@ -176,6 +187,7 @@ export default function HomePage({
       )}
 
       {/* ส่วนปิดท้ายหน้า: ชวนผู้ใช้กลับไปเลือกสินค้า */}
+      <NewsletterSignup {...newsletter} />
       <Box
         component="section"
         sx={{
