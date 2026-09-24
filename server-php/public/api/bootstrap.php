@@ -5,8 +5,22 @@ require dirname(__DIR__, 2) . '/mysql/connection.php';
 
 function apiOrigin(): void {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    $allowed = array_filter(array_map('trim', explode(',', getenv('API_ALLOWED_ORIGINS') ?: 'http://localhost:5173,http://127.0.0.1:5173')));
-    if ($origin !== '' && !in_array($origin, $allowed, true)) {
+    $configured = getenv('API_ALLOWED_ORIGINS');
+    if (($configured === false || $configured === '') && is_file(dirname(__DIR__, 2) . '/config.local.php')) {
+        $localConfig = require dirname(__DIR__, 2) . '/config.local.php';
+        $configured = (string)($localConfig['API_ALLOWED_ORIGINS'] ?? $localConfig['ALLOWED_ORIGINS'] ?? '');
+    }
+    $allowed = array_filter(array_map('trim', explode(',', $configured ?: 'http://localhost:5173,http://127.0.0.1:5173')));
+    $parts = parse_url($origin);
+    $host = strtolower((string)($parts['host'] ?? ''));
+    $port = (int)($parts['port'] ?? 80);
+    $scheme = strtolower((string)($parts['scheme'] ?? ''));
+    $privateIp = filter_var($host, FILTER_VALIDATE_IP)
+        && !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    $localDevelopmentOrigin = $scheme === 'http'
+        && in_array($port, [80, 5173, 5174, 5500, 5501, 8080], true)
+        && (in_array($host, ['localhost','127.0.0.1','::1'], true) || $privateIp);
+    if ($origin !== '' && !in_array($origin, $allowed, true) && !$localDevelopmentOrigin) {
         http_response_code(403); exit;
     }
     if ($origin !== '') {

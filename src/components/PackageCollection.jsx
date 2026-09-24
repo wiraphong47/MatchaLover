@@ -204,6 +204,7 @@ export default function PackageCollection({ packages, products, onAdd }) {
                 price: formatPrice(pricing.price),
                 size: "Gift set",
                 selectedMatcha: selectedMatcha.name,
+                selectedMatchaId: selectedMatcha.id,
               });
               setSelected(null);
             }}

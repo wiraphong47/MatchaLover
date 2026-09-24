@@ -27,7 +27,9 @@ export default function Faq() {
   return (
     <Box
       component="section"
+      id="brew-guide"
       sx={{
+        scrollMarginTop: 90,
         px: { xs: 2.5, md: "18vw" },
         py: { xs: 7, md: 10 },
         bgcolor: "#ece7db",

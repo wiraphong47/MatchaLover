@@ -13,10 +13,12 @@ expect(str_contains($html,'cid:newsletter-hero-v2'),'Newsletter background missi
 expect(str_contains($html,'customer@example.com'),'Recipient email missing');
 expect(!str_contains($html,'<script>'),'HTML injection');
 expect(str_contains($plain,'unsubscribe'),'Unsubscribe missing from plain text');
-expect(str_contains($html,'https://shop.example/MatchaLover/#products'),'Shop link missing');
+expect(str_contains($html,'href="https://wiraphong47.github.io/MatchaLover/"'),'Public website link missing');
 [$subject,$html,$plain] = emailTemplate('member',$person,[]);
 expect(str_contains($html,'cid:member-welcome-background-v2'),'Member background missing');
 expect(str_contains($html,'&lt;script&gt;alert(1)&lt;/script&gt;'),'Escaped member name missing');
+expect(str_contains($html,'href="https://wiraphong47.github.io/MatchaLover/"'),'Member website link missing');
+expect(str_contains($plain,'https://wiraphong47.github.io/MatchaLover/'),'Member plain-text link missing');
 [$subject,$html,$plain] = emailTemplate('confirm',$person,['token'=>str_repeat('a',64)]);
 expect(str_contains($html,'24'),'Token lifetime copy missing');
 expect(str_contains($plain,'confirm.php?'),'Confirmation URL missing');

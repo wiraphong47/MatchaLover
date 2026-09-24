@@ -10,8 +10,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { memberIdFor } from "../utils/member";
 import useAsyncAction from "../hooks/useAsyncAction";
-
-const money = (amount) => `฿${Number(amount || 0).toLocaleString("th-TH")}`;
+import { formatOrderDate, money, orderStatusLabels } from "../utils/order";
 
 export default function MemberDashboard({
   customer,
@@ -19,12 +18,14 @@ export default function MemberDashboard({
   onBack,
   onLogout,
   onSave,
+  initialTab = "profile",
 }) {
-  const [tab, setTab] = useState("profile");
+  const [tab, setTab] = useState(initialTab);
   const [editing, setEditing] = useState(false);
   const { run, busy, error } = useAsyncAction(onSave);
   const [form, setForm] = useState(customer);
   useEffect(() => setForm(customer), [customer]);
+  useEffect(() => setTab(initialTab), [initialTab]);
   const memberId = memberIdFor(customer);
   const memberOrders = useMemo(
     () => orders.filter((order) => order.memberId === memberId),
@@ -368,14 +369,14 @@ export default function MemberDashboard({
                     >
                       <Box>
                         <Typography sx={{ fontWeight: 700 }}>
-                          คำสั่งซื้อ #{order.id}
+                          คำสั่งซื้อ #{order.orderNumber || order.id}
                         </Typography>
                         <Typography sx={{ color: "#607159", fontSize: 15 }}>
                           ผู้สั่ง: {order.customerName || customer?.name} ·
                           รหัสสมาชิก: {order.memberId || memberId}
                         </Typography>
                         <Typography sx={{ color: "#607159", fontSize: 15 }}>
-                          {order.createdAt} ·{" "}
+                          {formatOrderDate(order.createdAt)} ·{" "}
                           {order.items
                             .map((item) => `${item.name} × ${item.quantity}`)
                             .join(", ")}
@@ -383,7 +384,11 @@ export default function MemberDashboard({
                       </Box>
                       <Box sx={{ textAlign: { sm: "right" } }}>
                         <Chip
-                          label="ยืนยันคำสั่งซื้อแล้ว"
+                          label={
+                            orderStatusLabels[order.status] ||
+                            order.status ||
+                            "รับคำสั่งซื้อแล้ว"
+                          }
                           size="small"
                           sx={{ bgcolor: "#e5eedc", color: "#547d3b" }}
                         />

@@ -13,13 +13,15 @@ function emailTemplate(string $kind, array $person, array $payload): array {
     } elseif ($kind === 'member') {
         $subject = 'ยินดีต้อนรับสู่ Matcha Mori';
         $body = 'ยินดีต้อนรับคุณ ' . $name . ' เข้าสู่ครอบครัว Matcha Mori บัญชีของคุณพร้อมใช้งานแล้ว';
-        $url = $site; $cta = 'ไปที่เว็บไซต์ Matcha Mori';
+        $url = 'https://wiraphong47.github.io/MatchaLover/';
+        $cta = 'ไปที่เว็บไซต์ Matcha Mori';
     } else {
         $subject = 'มัทฉะที่คัดมาให้ตามเมนูโปรดของคุณ · Matcha Mori';
         $tips = ['pure'=>'เริ่มจากผงมัทฉะ 2 กรัม ร่อนก่อนตี และใช้น้ำอุ่นไม่เดือด เพื่อสัมผัสกลิ่นและรสของชา', 'latte'=>'ตีมัทฉะกับน้ำอุ่นเล็กน้อยก่อนเติมนม แล้วค่อยปรับความหวานตามชอบ', 'baking'=>'ร่อนมัทฉะรวมกับวัตถุดิบแห้งก่อนผสม เพื่อช่วยลดการจับตัวเป็นก้อน'];
         $menu = $person['menu'];
         $body = 'ขอบคุณที่สมัครรับข่าวสาร อีเมล ' . $email . ' ถูกเพิ่มในรายชื่อรับข่าวสารเรียบร้อยแล้ว';
-        $url = $site . '#products'; $cta = 'เลือกมัทฉะแก้วแรกสำหรับคุณ';
+        $url = 'https://wiraphong47.github.io/MatchaLover/';
+        $cta = 'เลือกมัทฉะแก้วแรกสำหรับคุณ';
         $unsubscribe = rtrim(config('API_URL'),'/') . '/confirm.php?' . http_build_query(['action'=>'unsubscribe','id'=>$person['id'],'token'=>unsubscribeToken($person['id'])]);
         $footer = '<p><a href="' . escape($unsubscribe) . '">ยกเลิกรับข่าวสาร</a></p>';
     }

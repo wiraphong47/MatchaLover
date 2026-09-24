@@ -19,6 +19,7 @@ export default function PersonalizedRecommendations({
   personalized,
   recommendations = [],
   total,
+  initialCount = 3,
   expanded,
   isMember,
   busy,
@@ -112,7 +113,7 @@ export default function PersonalizedRecommendations({
       >
         <TextField
           select
-          label="4. งบประมาณต่อชิ้น"
+          label="7. งบประมาณต่อชิ้น"
           value={budget}
           disabled={busy}
           onChange={(event) => onBudgetChange(event.target.value)}
@@ -174,7 +175,7 @@ export default function PersonalizedRecommendations({
       </Typography>
       <Typography aria-live="polite" sx={{ mt: 3 }}>
         พบ {total} รายการ · แสดง {recommendations.length} รายการ
-        {!expanded && total > 3 ? "แรก" : ""}
+        {!expanded && total > initialCount ? "แรก" : ""}
       </Typography>
       {!total && (
         <Alert severity="info" sx={{ mt: 2 }}>
@@ -252,13 +253,15 @@ export default function PersonalizedRecommendations({
           </Box>
         ))}
       </Box>
-      {total > 3 && (
+      {total > initialCount && (
         <Button
           onClick={onExpand}
           variant="outlined"
           sx={{ mt: 3, color: "#efe2bd", borderColor: "#efe2bd" }}
         >
-          {expanded ? "แสดงน้อยลง" : `ดูเพิ่มเติม (${total - 3} รายการ)`}
+          {expanded
+            ? "แสดงน้อยลง"
+            : `ดูเพิ่มเติม (${total - initialCount} รายการ)`}
         </Button>
       )}
     </Box>

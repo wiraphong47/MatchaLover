@@ -1,5 +1,6 @@
 export const packages = [
   {
+    id: "package-1",
     name: "Daily Matcha Set",
     subtitle: "ชุดเริ่มต้นสำหรับทุกวัน",
     price: "1,290",
@@ -20,6 +21,7 @@ export const packages = [
     ],
   },
   {
+    id: "package-2",
     name: "Ceremony Gift Set",
     subtitle: "ชุดของขวัญพรีเมียม",
     price: "2,690",
@@ -44,6 +46,7 @@ export const packages = [
     ],
   },
   {
+    id: "package-3",
     name: "Home Tea Ritual Set",
     subtitle: "ชุดอุปกรณ์ชงครบชุด",
     price: "1,990",
@@ -66,6 +69,7 @@ export const packages = [
 
 export const brewTools = [
   {
+    id: "tool-1",
     name: "ถ้วยชงชามัทฉะ",
     subtitle: "Chawan ทรงคลาสสิก",
     price: "590",
@@ -73,6 +77,7 @@ export const brewTools = [
     description: "ถ้วยชงทรงพอดีมือ ช่วยให้ตีชาและดื่มได้อย่างสะดวก",
   },
   {
+    id: "tool-2",
     name: "Chashaku ไม้ไผ่",
     subtitle: "ช้อนตักมัทฉะแบบญี่ปุ่น",
     price: "190",
@@ -80,6 +85,7 @@ export const brewTools = [
     description: "ช้อนตักผงมัทฉะขนาดพอดี ช่วยให้กะปริมาณสำหรับหนึ่งแก้วได้ง่าย",
   },
   {
+    id: "tool-3",
     name: "ช้อนตักชาไม้ไผ่",
     subtitle: "เก็บทรงแปรงตีให้สวยงาม",
     price: "350",
@@ -88,6 +94,7 @@ export const brewTools = [
       "ช่วยรักษารูปทรงของแปรงตีหลังใช้งาน ให้พร้อมสำหรับการชงครั้งต่อไป",
   },
   {
+    id: "tool-4",
     name: "ตะแกรงร่อนมัทฉะ",
     subtitle: "ผงเนียนละเอียดก่อนชง",
     price: "290",
@@ -95,6 +102,7 @@ export const brewTools = [
     description: "ร่อนผงก่อนชงเพื่อให้ละลายง่าย ตีเนียน และลดการจับตัวเป็นก้อน",
   },
   {
+    id: "tool-5",
     name: "แท่นวางแปรงชงชา",
     subtitle: "ผงเนียนละเอียดก่อนชง",
     price: "290",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
 import { products } from "./data/products";
@@ -12,8 +12,13 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import CartDrawer from "./components/CartDrawer";
 import CheckoutPage from "./pages/CheckoutPage";
 import LoginPage from "./pages/LoginPage";
-import RegisterDialog from "./pages/RegisterDialog";
 import MemberPage from "./pages/MemberPage";
+import OrderSummaryPage from "./pages/OrderSummaryPage";
+import ShopPage from "./pages/ShopPage";
+import MatchaFinderPage from "./pages/MatchaFinderPage";
+import RegisterPage from "./pages/RegisterPage";
+import BrewGuidePage from "./pages/BrewGuidePage";
+import ContactPage from "./pages/ContactPage";
 
 export default function App() {
   const shop = useShop();
@@ -23,8 +28,8 @@ export default function App() {
   const [page, setPage] = useState("home");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
-  const [registerOpen, setRegisterOpen] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState(false);
+  const [memberInitialTab, setMemberInitialTab] = useState("profile");
   const {
     addToCart,
     addProductToCart,
@@ -32,15 +37,78 @@ export default function App() {
     cartCount,
     changeQuantity,
     completeOrder,
+    confirmedOrder,
     couponApplied,
     couponCode,
     orders,
+    orderBusy,
+    orderError,
+    clearOrderError,
+    resendConfirmationEmail,
     setCart,
     setCouponCode,
   } = shop;
   const activeCustomer = isLoggedIn ? customer : null;
 
+  useEffect(() => {
+    const openRichMenuLink = () => {
+      const action = decodeURIComponent(window.location.hash.slice(1)).replace(
+        /^\/+/,
+        ""
+      );
+      if (!action) return;
+      setSelectedProduct(null);
+      const route = {
+        shop: "shop",
+        products: "shop",
+        "matcha-finder": "matcha-finder",
+        register: "register",
+        "brew-guide": "brew-guide",
+        contact: "contact",
+      }[action];
+      if (route) {
+        setPage(route);
+        window.scrollTo({ top: 0, behavior: "auto" });
+        return;
+      }
+      const targetId = {
+        top: "top",
+        story: "story",
+      }[action];
+      if (!targetId) return;
+      setPage("home");
+      window.setTimeout(
+        () =>
+          document
+            .getElementById(targetId)
+            ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        100
+      );
+    };
+
+    openRichMenuLink();
+    window.addEventListener("hashchange", openRichMenuLink);
+    window.addEventListener("popstate", openRichMenuLink);
+    return () => {
+      window.removeEventListener("hashchange", openRichMenuLink);
+      window.removeEventListener("popstate", openRichMenuLink);
+    };
+  }, []);
+
   const goTo = (nextPage) => {
+    const richMenuPath = {
+      shop: "/shop",
+      "matcha-finder": "/matcha-finder",
+      register: "/register",
+      "brew-guide": "/brew-guide",
+      contact: "/contact",
+    }[nextPage];
+    const baseUrl = `${window.location.pathname}${window.location.search}`;
+    window.history.pushState(
+      null,
+      "",
+      richMenuPath ? `${baseUrl}#${richMenuPath}` : baseUrl
+    );
     setSelectedProduct(null);
     setPage(nextPage);
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
@@ -57,10 +125,12 @@ export default function App() {
       0
     );
   };
-  const openRegistration = () => setRegisterOpen(true);
+  const openRegistration = () => goTo("register");
   const openMemberPortal = () => {
-    if (isLoggedIn) goTo("member");
-    else goTo("login");
+    if (isLoggedIn) {
+      setMemberInitialTab("profile");
+      goTo("member");
+    } else goTo("login");
   };
   const openProduct = (product) => {
     setSelectedProduct(product);
@@ -88,7 +158,6 @@ export default function App() {
   };
   const register = async (profile) => {
     const result = await auth.register(profile);
-    setRegisterOpen(false);
     setNotice({
       severity: result.emailSent ? "success" : "warning",
       text: result.emailSent
@@ -117,16 +186,34 @@ export default function App() {
       setNotice({ severity: "error", text: authMessage(error) });
     }
   };
-  const confirmCheckout = (payment) => {
+  const confirmCheckout = async (payment) => {
     if (!isLoggedIn || !customer) {
       goTo("login");
       return;
     }
-    completeOrder({ ...payment, customer });
-    goTo("member");
+    try {
+      const order = await completeOrder({ ...payment, customer });
+      setNotice({
+        severity:
+          order.emailSent === true
+            ? "success"
+            : order.emailSent === false
+              ? "warning"
+              : "info",
+        text:
+          order.emailSent === true
+            ? "บันทึกคำสั่งซื้อและส่งสรุปไปยังอีเมลของคุณแล้ว"
+            : order.emailSent === false
+              ? "บันทึกคำสั่งซื้อแล้ว แต่ยังส่งอีเมลสรุปไม่สำเร็จ"
+              : "บันทึกคำสั่งซื้อในโหมดทดลองแล้ว แต่ยังไม่ได้ส่งอีเมลจริง",
+      });
+      goTo("order-summary");
+    } catch {
+      // useShop แสดงข้อความจากเซิร์ฟเวอร์ไว้ในหน้าชำระเงินแล้ว
+    }
   };
   const content = (() => {
-    if (["member", "checkout"].includes(page)) {
+    if (["member", "checkout", "order-summary"].includes(page)) {
       if (auth.loading)
         return (
           <Box sx={{ p: 6, textAlign: "center" }}>
@@ -165,17 +252,63 @@ export default function App() {
         />
       );
     switch (page) {
+      case "shop":
+        return (
+          <ShopPage
+            products={products}
+            onAdd={addToCart}
+            onOpenProduct={openProduct}
+          />
+        );
+      case "matcha-finder":
+        return (
+          <MatchaFinderPage
+            products={products}
+            customer={activeCustomer}
+            onSavePreferences={auth.save}
+            onAdd={addToCart}
+            onOpenProduct={openProduct}
+          />
+        );
+      case "register":
+        return <RegisterPage onSave={register} onBack={returnHome} />;
+      case "brew-guide":
+        return <BrewGuidePage />;
+      case "contact":
+        return (
+          <ContactPage
+            onBackToLine={() => {
+              if (window.history.length > 1) window.history.back();
+              else window.close();
+            }}
+          />
+        );
       case "checkout":
         return (
           <CheckoutPage
             cart={cart}
             customer={customer}
             couponApplied={couponApplied}
+            busy={orderBusy}
+            error={orderError}
             onBack={() => {
+              clearOrderError();
               scrollToSection("products");
               setCartOpen(true);
             }}
             onConfirm={confirmCheckout}
+          />
+        );
+      case "order-summary":
+        return (
+          <OrderSummaryPage
+            order={confirmedOrder}
+            onContinue={() => scrollToSection("products")}
+            onViewOrders={() => {
+              setMemberInitialTab("orders");
+              goTo("member");
+            }}
+            onResendEmail={resendConfirmationEmail}
           />
         );
       case "login":
@@ -192,6 +325,7 @@ export default function App() {
           <MemberPage
             customer={customer}
             orders={orders}
+            initialTab={memberInitialTab}
             onBack={returnHome}
             onSave={auth.save}
             onLogout={logout}
@@ -217,7 +351,7 @@ export default function App() {
     <>
       <SiteHeader
         onHome={returnHome}
-        onProducts={() => scrollToSection("products")}
+        onProducts={() => goTo("shop")}
         onStory={() => scrollToSection("story")}
         cartCount={cartCount}
         onOpenCart={() => setCartOpen(true)}
@@ -245,12 +379,6 @@ export default function App() {
         couponCode={couponCode}
         onCouponChange={setCouponCode}
         couponApplied={couponApplied}
-      />
-      <RegisterDialog
-        open={registerOpen}
-        onClose={() => setRegisterOpen(false)}
-        customer={null}
-        onSave={register}
       />
     </>
   );

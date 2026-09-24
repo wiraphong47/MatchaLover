@@ -1,0 +1,121 @@
+{
+  "labels": {
+    "pure": "ชงดื่มเพียว ๆ",
+    "latte": "มัทฉะลาเต้",
+    "baking": "ทำขนมและเครื่องดื่ม",
+    "strong": "รสเข้ม ชาชัด",
+    "light": "รสอ่อน ดื่มง่าย",
+    "smooth": "นุ่มละมุน กลมกล่อม",
+    "umami": "อูมามิ หวานนัว",
+    "low-bitter": "ขมน้อย ฝาดน้อย",
+    "bitter": "ขมปลายเล็กน้อย",
+    "fragrant": "กลิ่นหอมชาชัด",
+    "fresh": "กลิ่นชาเขียวสดชื่น",
+    "nutty": "กลิ่นถั่ว หอมมัน",
+    "roasted": "กลิ่นคั่วอ่อน ๆ",
+    "delicate": "กลิ่นอ่อน ๆ ละมุน",
+    "texture-light": "เบาบาง ดื่มคล่อง",
+    "texture-silky": "เนียนนุ่ม ลื่นคอ",
+    "texture-creamy": "ครีมมี่ เต็มปาก",
+    "texture-rich": "เข้มข้น หนักแน่น",
+    "level-beginner": "เพิ่งเริ่มดื่มมัทฉะ",
+    "level-regular": "ดื่มมัทฉะเป็นประจำ",
+    "level-enthusiast": "สายมัทฉะจริงจัง",
+    "occasion-daily": "ดื่มง่ายในทุกวัน",
+    "occasion-relax": "ช่วงพักผ่อน ละเมียดละไม",
+    "occasion-special": "พิธีชงหรือโอกาสพิเศษ",
+    "occasion-cafe": "ทำเมนูสไตล์คาเฟ่"
+  },
+  "traits": {
+    "Ceremonial Grade": [
+      "smooth",
+      "umami",
+      "texture-silky",
+      "level-regular",
+      "level-enthusiast",
+      "occasion-relax",
+      "occasion-special"
+    ],
+    "Premium Blend": [
+      "strong",
+      "umami",
+      "fragrant",
+      "texture-creamy",
+      "level-beginner",
+      "level-regular",
+      "occasion-daily",
+      "occasion-cafe"
+    ],
+    "Culinary Grade": [
+      "strong",
+      "texture-rich",
+      "level-beginner",
+      "level-regular",
+      "occasion-cafe"
+    ],
+    "Asahi Matcha": [
+      "smooth",
+      "umami",
+      "texture-silky",
+      "level-enthusiast",
+      "occasion-relax",
+      "occasion-special"
+    ],
+    "Gokou Matcha": [
+      "strong",
+      "nutty",
+      "texture-rich",
+      "level-enthusiast",
+      "occasion-special"
+    ],
+    "Okumidori Matcha": [
+      "smooth",
+      "umami",
+      "low-bitter",
+      "nutty",
+      "fresh",
+      "texture-creamy",
+      "level-beginner",
+      "level-regular",
+      "occasion-daily",
+      "occasion-cafe"
+    ],
+    "Samidori Matcha": [
+      "strong",
+      "bitter",
+      "texture-rich",
+      "level-regular",
+      "level-enthusiast",
+      "occasion-special"
+    ],
+    "Ujihikari Matcha": [
+      "smooth",
+      "nutty",
+      "delicate",
+      "texture-silky",
+      "level-beginner",
+      "level-regular",
+      "occasion-daily",
+      "occasion-relax"
+    ],
+    "Yabukita Matcha": [
+      "light",
+      "fresh",
+      "texture-light",
+      "level-beginner",
+      "occasion-daily",
+      "occasion-relax"
+    ]
+  },
+  "productOrder": [
+    "Ceremonial Grade",
+    "Premium Blend",
+    "Culinary Grade",
+    "Asahi Matcha",
+    "Gokou Matcha",
+    "Okumidori Matcha",
+    "Samidori Matcha",
+    "Ujihikari Matcha",
+    "Yabukita Matcha"
+  ]
+}

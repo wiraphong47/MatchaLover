@@ -1,5 +1,6 @@
 export const products = [
   {
+    id: "matcha-ceremonial",
     name: "Ceremonial Grade",
     thai: "พิธีชงชาเกรดพรีเมียม",
     price: "590",
@@ -12,6 +13,7 @@ export const products = [
   },
 
   {
+    id: "matcha-premium",
     name: "Premium Blend",
     thai: "เบลนด์พรีเมียม",
     price: "390",
@@ -24,6 +26,7 @@ export const products = [
   },
 
   {
+    id: "matcha-culinary",
     name: "Culinary Grade",
     thai: "สำหรับทำขนมและเครื่องดื่ม",
     price: "290",
@@ -36,6 +39,7 @@ export const products = [
   },
 
   {
+    id: "matcha-asahi",
     name: "Asahi Matcha",
     thai: "มัทฉะสายพันธุ์ Asahi",
     price: "890",
@@ -52,6 +56,7 @@ export const products = [
   },
 
   {
+    id: "matcha-gokou",
     name: "Gokou Matcha",
     thai: "มัทฉะสายพันธุ์ Gokou",
     price: "950",
@@ -68,6 +73,7 @@ export const products = [
   },
 
   {
+    id: "matcha-okumidori",
     name: "Okumidori Matcha",
     thai: "มัทฉะสายพันธุ์ Okumidori",
     price: "650",
@@ -84,6 +90,7 @@ export const products = [
   },
 
   {
+    id: "matcha-samidori",
     name: "Samidori Matcha",
     thai: "มัทฉะสายพันธุ์ Samidori",
     price: "690",
@@ -100,6 +107,7 @@ export const products = [
   },
 
   {
+    id: "matcha-ujihikari",
     name: "Ujihikari Matcha",
     thai: "มัทฉะสายพันธุ์ Ujihikari",
     price: "790",
@@ -116,6 +124,7 @@ export const products = [
   },
 
   {
+    id: "matcha-yabukita",
     name: "Yabukita Matcha",
     thai: "มัทฉะสายพันธุ์ Yabukita",
     price: "490",

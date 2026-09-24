@@ -3,7 +3,9 @@ export default function SiteFooter() {
   return (
     <Box
       component="footer"
+      id="contact"
       sx={{
+        scrollMarginTop: 90,
         bgcolor: "#183b2a",
         color: "#f2ead8",
         px: { xs: 3, md: "8vw" },

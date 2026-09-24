@@ -1,16 +1,22 @@
 const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 let csrf = "";
 
-export function apiConfigured() { return Boolean(API_URL); }
+export function apiConfigured() {
+  return Boolean(API_URL);
+}
 
 export async function apiRequest(path, options = {}) {
   if (!API_URL) throw new Error("ยังไม่ได้ตั้งค่าการเชื่อมต่อระบบสมาชิก");
   if (!csrf && path !== "/session.php") await apiRequest("/session.php");
+  const isFormData =
+    typeof FormData !== "undefined" && options.body instanceof FormData;
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     credentials: "include",
     headers: {
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(options.body && !isFormData
+        ? { "Content-Type": "application/json" }
+        : {}),
       ...(csrf ? { "X-CSRF-Token": csrf } : {}),
       ...options.headers,
     },
@@ -26,4 +32,6 @@ export async function apiRequest(path, options = {}) {
   return data;
 }
 
-export function clearApiSession() { csrf = ""; }
+export function clearApiSession() {
+  csrf = "";
+}

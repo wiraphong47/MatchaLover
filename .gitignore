@@ -22,3 +22,5 @@ Thumbs.db
 server-php/vendor/
 server-php/mysql/config.local.php
 server-php/config.local.php
+server-php/storage/payment-slips/*
+!server-php/storage/payment-slips/.gitkeep

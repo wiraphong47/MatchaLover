@@ -6,6 +6,8 @@ import {
 } from "../utils/rankMatcha";
 import useAsyncAction from "./useAsyncAction";
 
+const INITIAL_RECOMMENDATION_COUNT = 3;
+
 export default function useRecommendations(
   products,
   customer,
@@ -42,7 +44,10 @@ export default function useRecommendations(
     saved,
     isMember: Boolean(customer),
     personalized: !current && selected.length > 0,
-    recommendations: expanded ? results : results.slice(0, 3),
+    recommendations: expanded
+      ? results
+      : results.slice(0, INITIAL_RECOMMENDATION_COUNT),
+    initialCount: INITIAL_RECOMMENDATION_COUNT,
     total: results.length,
     expanded,
     onToggle: (key) =>

@@ -4,6 +4,7 @@ return [
     'SITE_URL' => 'http://localhost:5173/MatchaLover/',
     'API_URL' => 'http://127.0.0.1:8080',
     'ALLOWED_ORIGINS' => 'http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,https://wiraphong47.github.io',
+    'API_ALLOWED_ORIGINS' => 'http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,https://wiraphong47.github.io',
     'SMTP_HOST' => 'smtp.gmail.com',
     'SMTP_PORT' => '587',
     'SMTP_USERNAME' => 'your-email@gmail.com',

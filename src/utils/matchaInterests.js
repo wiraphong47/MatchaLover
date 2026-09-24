@@ -23,6 +23,32 @@ export const interestGroups = [
       { key: "delicate", label: "กลิ่นอ่อน ๆ ละมุน" },
     ],
   },
+  {
+    title: "เนื้อสัมผัสที่ชอบ",
+    options: [
+      { key: "texture-light", label: "เบาบาง ดื่มคล่อง" },
+      { key: "texture-silky", label: "เนียนนุ่ม ลื่นคอ" },
+      { key: "texture-creamy", label: "ครีมมี่ เต็มปาก" },
+      { key: "texture-rich", label: "เข้มข้น หนักแน่น" },
+    ],
+  },
+  {
+    title: "ระดับประสบการณ์",
+    options: [
+      { key: "level-beginner", label: "เพิ่งเริ่มดื่มมัทฉะ" },
+      { key: "level-regular", label: "ดื่มมัทฉะเป็นประจำ" },
+      { key: "level-enthusiast", label: "สายมัทฉะจริงจัง" },
+    ],
+  },
+  {
+    title: "โอกาสที่ดื่ม",
+    options: [
+      { key: "occasion-daily", label: "ดื่มง่ายในทุกวัน" },
+      { key: "occasion-relax", label: "ช่วงพักผ่อน ละเมียดละไม" },
+      { key: "occasion-special", label: "พิธีชงหรือโอกาสพิเศษ" },
+      { key: "occasion-cafe", label: "ทำเมนูสไตล์คาเฟ่" },
+    ],
+  },
 ];
 const options = interestGroups.flatMap((group) => group.options);
 const tokens = (note = "") =>

@@ -30,11 +30,24 @@ try {
 $emailSent = false;
 try {
     require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+    require_once dirname(__DIR__, 2) . '/memberRecommendations.php';
     $mailConfig = require dirname(__DIR__, 2) . '/config.local.php';
     $safeName = htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-    $siteUrl = rtrim((string)$mailConfig['SITE_URL'],'/') . '/';
+    $siteUrl = 'https://wiraphong47.github.io/MatchaLover/';
+    $recommendationEmail = ['html' => '', 'plain' => '', 'embeds' => []];
+    try {
+        $recommendations = memberRecommendations($note, 3);
+        $recommendationEmail = memberRecommendationEmailSection(
+            $recommendations,
+            $siteUrl,
+            dirname(__DIR__, 2) . '/assets/email-products'
+        );
+    } catch (Throwable $recommendationError) {
+        // A missing optional recommendation asset must never block the welcome email.
+        error_log('Member recommendation email section failed: ' . get_class($recommendationError));
+    }
     $content = '<p style="margin:0 0 10px;font-family:Georgia,Tahoma,serif;font-size:27px">Matcha Mori</p><p style="margin:0 0 22px;font-size:12px;letter-spacing:2px">มัทฉะแท้ คุณภาพพรีเมียม</p><h1 style="margin:0 0 12px;font-size:35px;line-height:1.12">ยินดีต้อนรับคุณ<br>' . $safeName . '<br>เข้าสู่ครอบครัวมัทฉะของเรา</h1><p style="margin:0 0 18px;font-size:16px">ขอบคุณที่สมัครสมาชิก<br>บัญชีของคุณพร้อมใช้งานแล้ว</p><table role="presentation" cellspacing="8" cellpadding="0" style="margin-left:-8px"><tr><td style="padding:10px 13px;background:#edf1dc;border-radius:10px"><strong>100 Points</strong><br><span style="font-size:12px">ต้อนรับสมาชิกใหม่</span></td><td style="padding:10px 13px;background:#edf1dc;border-radius:10px"><strong>ลด 12%</strong><br><span style="font-size:12px">โค้ด MATCHA12</span></td></tr></table>';
-    $html = '<!doctype html><html lang="th"><meta charset="utf-8"><body style="margin:0;background:#f3eddf;color:#123c29;font-family:Tahoma,Arial,sans-serif"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:12px"><table role="presentation" width="760" height="507" cellspacing="0" cellpadding="0" background="cid:member-welcome-background-v2" style="width:100%;max-width:760px;height:507px;background:#fffdf7 url(cid:member-welcome-background-v2) center/cover no-repeat"><tr><td width="52%" valign="top" style="padding:38px 16px 24px 38px">' . $content . '<p style="margin:22px 0 0"><a href="' . htmlspecialchars($siteUrl,ENT_QUOTES,'UTF-8') . '" style="display:inline-block;padding:13px 22px;border-radius:999px;background:#315d3f;color:#fff;text-decoration:none;font-weight:bold">ไปที่เว็บไซต์ Matcha Mori &nbsp;→</a></p></td><td width="48%">&nbsp;</td></tr></table></td></tr></table></body></html>';
+    $html = '<!doctype html><html lang="th"><meta charset="utf-8"><body style="margin:0;background:#f3eddf;color:#123c29;font-family:Tahoma,Arial,sans-serif"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:12px"><table role="presentation" width="760" height="507" cellspacing="0" cellpadding="0" background="cid:member-welcome-background-v2" style="width:100%;max-width:760px;height:507px;background:#fffdf7 url(cid:member-welcome-background-v2) center/cover no-repeat"><tr><td width="52%" valign="top" style="padding:38px 16px 24px 38px">' . $content . '<p style="margin:22px 0 0"><a href="' . htmlspecialchars($siteUrl,ENT_QUOTES,'UTF-8') . '" style="display:inline-block;padding:13px 22px;border-radius:999px;background:#315d3f;color:#fff;text-decoration:none;font-weight:bold">ไปที่เว็บไซต์ Matcha Mori &nbsp;→</a></p></td><td width="48%">&nbsp;</td></tr></table>' . $recommendationEmail['html'] . '</td></tr></table></body></html>';
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
     $mail->isSMTP();
     $mail->Host = $mailConfig['SMTP_HOST'];
@@ -50,8 +63,11 @@ try {
     $mail->Subject = 'ยินดีต้อนรับสู่ Matcha Mori';
     $mail->isHTML(true);
     $mail->Body = $html;
-    $mail->AltBody = 'ยินดีต้อนรับคุณ ' . $name . ' เข้าสู่ครอบครัว Matcha Mori บัญชีของคุณพร้อมใช้งานแล้ว ' . $siteUrl;
+    $mail->AltBody = 'ยินดีต้อนรับคุณ ' . $name . ' เข้าสู่ครอบครัว Matcha Mori บัญชีของคุณพร้อมใช้งานแล้ว ' . $siteUrl . $recommendationEmail['plain'];
     $mail->addEmbeddedImage(dirname(__DIR__, 2) . '/assets/member-welcome-background-v2.png','member-welcome-background-v2');
+    foreach ($recommendationEmail['embeds'] as $embed) {
+        $mail->addEmbeddedImage($embed['path'], $embed['cid']);
+    }
     $mail->send();
     $emailSent = true;
 } catch (Throwable $mailError) {

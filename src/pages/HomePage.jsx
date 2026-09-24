@@ -147,11 +147,13 @@ export default function HomePage({
           </Box>
         )}
         {!isSearching && (category === "all" || category === "matcha") && (
-          <RecommendationQuiz
-            {...recommendation}
-            onAdd={onAdd}
-            onView={onOpenProduct}
-          />
+          <Box id="matcha-finder" sx={{ scrollMarginTop: 90 }}>
+            <RecommendationQuiz
+              {...recommendation}
+              onAdd={onAdd}
+              onView={onOpenProduct}
+            />
+          </Box>
         )}
         {!isSearching && (category === "all" || category === "matcha") && (
           <Box id="grades">
