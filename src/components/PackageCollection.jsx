@@ -22,7 +22,12 @@ const packPricing = (pack, matcha) => {
   return { original, price };
 };
 
-export default function PackageCollection({ packages, products, onAdd }) {
+export default function PackageCollection({
+  packages,
+  products,
+  onAdd,
+  onOpenProduct,
+}) {
   const [selected, setSelected] = useState(null);
   const [selectedMatcha, setSelectedMatcha] = useState(null);
   const [imageOpen, setImageOpen] = useState(false);
@@ -68,7 +73,12 @@ export default function PackageCollection({ packages, products, onAdd }) {
           }}
         >
           {packages.map((pack) => (
-            <PackageCard key={pack.name} pack={pack} onView={openPackage} />
+            <PackageCard
+              key={pack.name}
+              pack={pack}
+              onView={openPackage}
+              onOpenProduct={onOpenProduct}
+            />
           ))}
         </Box>
       </Box>

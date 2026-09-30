@@ -170,13 +170,18 @@ export default function HomePage({
               packages={filteredPackages}
               products={products}
               onAdd={onAdd}
+              onOpenProduct={onOpenProduct}
             />
           </Box>
         )}
       {(category === "all" || category === "tools") &&
         filteredTools.length > 0 && (
           <Box id="tools">
-            <BrewTools tools={filteredTools} onAdd={onAdd} />
+            <BrewTools
+              tools={filteredTools}
+              onAdd={onAdd}
+              onOpenProduct={onOpenProduct}
+            />
           </Box>
         )}
       {!isSearching && (

@@ -63,7 +63,9 @@ export default function App() {
       }
       const productMatch = action.match(/^product\/([^/]+)$/);
       if (productMatch) {
-        const product = products.find((item) => item.id === productMatch[1]);
+        const product = [...products, ...packages, ...brewTools].find(
+          (item) => item.id === productMatch[1]
+        );
         if (product) {
           setSelectedProduct(product);
           setPage("product-detail");
@@ -259,6 +261,7 @@ export default function App() {
       return (
         <ProductDetailPage
           product={selectedProduct}
+          products={products}
           onBack={() => goTo("shop")}
           onAdd={addToCart}
           onBuyNow={buyNow}

@@ -1,6 +1,6 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { assetUrl } from "../utils/assets";
-export default function BrewTools({ tools, onAdd }) {
+export default function BrewTools({ tools, onAdd, onOpenProduct }) {
   return (
     <Box
       component="section"
@@ -80,6 +80,9 @@ export default function BrewTools({ tools, onAdd }) {
                 <Typography sx={{ fontWeight: 700, fontSize: 20 }}>
                   ฿{tool.price}
                 </Typography>
+                <Button onClick={() => onOpenProduct(tool)} variant="outlined">
+                  ดูรายละเอียด
+                </Button>
                 <Button
                   onClick={() => onAdd({ ...tool, size: "1 ชิ้น" })}
                   variant="contained"

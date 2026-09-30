@@ -1,7 +1,7 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { assetUrl } from "../utils/assets";
 
-export default function PackageCard({ pack, onView }) {
+export default function PackageCard({ pack, onView, onOpenProduct }) {
   return (
     <Box
       sx={{
@@ -58,9 +58,17 @@ export default function PackageCard({ pack, onView }) {
               ฿{pack.price}
             </Typography>
           </Box>
-          <Button onClick={() => onView(pack)} sx={{ color: "#183b2a" }}>
-            ดูในแพ็ก →
-          </Button>
+          <Stack direction="row" spacing={0.5}>
+            <Button onClick={() => onView(pack)} sx={{ color: "#607159" }}>
+              ดูในแพ็ก
+            </Button>
+            <Button
+              onClick={() => onOpenProduct(pack)}
+              sx={{ color: "#183b2a" }}
+            >
+              รายละเอียด →
+            </Button>
+          </Stack>
         </Stack>
       </Box>
     </Box>

@@ -1,12 +1,59 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { useState } from "react";
+import {
+  Box,
+  Button,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { products as matchaProducts } from "../data/products";
 import { assetUrl } from "../utils/assets";
+
+const priceOf = (price) => Number(String(price ?? 0).replace(/,/g, ""));
+const formatPrice = (price) => price.toLocaleString("en-US");
+
 export default function ProductDetails({
   product,
+  products = matchaProducts,
   onBack,
   onAdd,
   onBuyNow,
   recommendation,
 }) {
+  const isPackage = Array.isArray(product.items) && product.defaultMatcha;
+  const isTool = product.id?.startsWith("tool-");
+  const [matchaId, setMatchaId] = useState(
+    products.find((item) => item.name === product.defaultMatcha)?.id ||
+      products[0]?.id
+  );
+  const selectedMatcha =
+    products.find((item) => item.id === matchaId) || products[0];
+  const packageOriginal = isPackage
+    ? product.accessoryPrice + priceOf(selectedMatcha?.price)
+    : 0;
+  const packagePrice = isPackage
+    ? Math.round((packageOriginal * (1 - product.discountRate)) / 10) * 10
+    : 0;
+  const displayPrice = isPackage ? packagePrice : priceOf(product.price);
+  const displayItem = isPackage
+    ? {
+        ...product,
+        name: `${product.name} · ${selectedMatcha.name}`,
+        price: formatPrice(packagePrice),
+        size: "Gift set",
+        selectedMatcha: selectedMatcha.name,
+        selectedMatchaId: selectedMatcha.id,
+      }
+    : isTool
+      ? { ...product, size: "1 ชิ้น" }
+      : product;
+  const productType = isPackage
+    ? "MATCHA MORI · GIFT SET"
+    : isTool
+      ? "MATCHA MORI · BREWING TOOL"
+      : `MATCHA MORI · ${product.size}`;
+
   return (
     <Box
       component="main"
@@ -43,7 +90,7 @@ export default function ProductDetails({
         <Box
           component="img"
           src={assetUrl(product.image)}
-          alt={`${product.name} ผงมัทฉะ`}
+          alt={product.name}
           sx={{
             width: "100%",
             height: { xs: 260, sm: 320, md: 530 },
@@ -59,7 +106,7 @@ export default function ProductDetails({
               fontWeight: 700,
             }}
           >
-            MATCHA MORI · {product.size}
+            {productType}
           </Typography>
           <Typography
             variant="h1"
@@ -80,53 +127,98 @@ export default function ProductDetails({
               mt: 1,
             }}
           >
-            {product.thai}
+            {product.thai || product.subtitle}
           </Typography>
           <Typography
             sx={{ fontSize: 18, lineHeight: 2, color: "#627060", mt: 3 }}
           >
-            {product.detail} เหมาะกับผู้ที่มองหารสชาติของมัทฉะแท้
-            ที่สดใหม่และเลือกใช้ได้ตรงกับช่วงเวลาของคุณ
+            {product.detail || product.description}
           </Typography>
-          <Box sx={{ my: 4, borderBlock: "1px solid #dcd3c2" }}>
-            {[
-              ["รสสัมผัส", product.note],
-              ["เหมาะสำหรับ", product.use],
-              ...(product.aroma
-                ? [
-                    ["กลิ่น", product.aroma],
-                    ["รส", product.taste],
-                    ["สำหรับคนไทย", product.thaiPreference],
-                    ["แหล่งปลูก", product.origin],
-                  ]
-                : []),
-            ].map(([label, value], index) => (
-              <Stack
-                key={label}
-                direction={{ xs: "column", sm: "row" }}
-                sx={{
-                  py: { xs: 1.15, sm: 1.8 },
-                  gap: { xs: 0.3, sm: 2 },
-                  borderBottom: "1px solid #dcd3c2",
-                }}
+
+          {isPackage && (
+            <>
+              <TextField
+                select
+                fullWidth
+                label="เลือกมัทฉะในแพ็ก"
+                value={selectedMatcha.id}
+                onChange={(event) => setMatchaId(event.target.value)}
+                sx={{ mt: 2.5 }}
               >
-                <Typography
-                  sx={{ width: { sm: 115 }, fontSize: 15, color: "#788272" }}
-                >
-                  {label}
-                </Typography>
-                <Typography
+                {products.map((item) => (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name} · {item.size} · ฿{item.price}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Typography sx={{ color: "#547d3b", fontSize: 14, mt: 1 }}>
+                ราคาปรับตามมัทฉะที่เลือก และรวมส่วนลดแพ็กเกจแล้ว
+              </Typography>
+              <Typography sx={{ mt: 2.5, fontWeight: 700, fontSize: 18 }}>
+                ภายในแพ็กประกอบด้วย
+              </Typography>
+              <Stack component="ul" spacing={0.7} sx={{ pl: 2.5, mt: 1 }}>
+                {product.items.map((item) => (
+                  <Stack
+                    key={item.name}
+                    component="li"
+                    direction="row"
+                    justifyContent="space-between"
+                    sx={{ color: "#415444", pr: 1 }}
+                  >
+                    <Typography component="span">
+                      {item.isMatcha ? selectedMatcha.name : item.name}
+                    </Typography>
+                    <Typography component="span" sx={{ color: "#71806a" }}>
+                      {item.isMatcha
+                        ? `฿${formatPrice(priceOf(selectedMatcha.price))}`
+                        : item.price
+                          ? `฿${formatPrice(priceOf(item.price))}`
+                          : "ของแถม"}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Stack>
+            </>
+          )}
+
+          {!isPackage && (
+            <Box sx={{ my: 4, borderBlock: "1px solid #dcd3c2" }}>
+              {[
+                ...(product.note ? [["รสสัมผัส", product.note]] : []),
+                ...(product.use ? [["เหมาะสำหรับ", product.use]] : []),
+                ...(product.aroma ? [["กลิ่น", product.aroma]] : []),
+                ...(product.taste ? [["รส", product.taste]] : []),
+                ...(product.origin ? [["แหล่งปลูก", product.origin]] : []),
+              ].map(([label, value]) => (
+                <Stack
+                  key={label}
+                  direction={{ xs: "column", sm: "row" }}
                   sx={{
-                    fontSize: 15,
-                    fontWeight: 700,
-                    overflowWrap: "anywhere",
+                    py: { xs: 1.15, sm: 1.8 },
+                    gap: { xs: 0.3, sm: 2 },
+                    borderBottom: "1px solid #dcd3c2",
                   }}
                 >
-                  {value}
-                </Typography>
-              </Stack>
-            ))}
-          </Box>
+                  <Typography
+                    sx={{ width: { sm: 115 }, fontSize: 15, color: "#788272" }}
+                  >
+                    {label}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      overflowWrap: "anywhere",
+                    }}
+                  >
+                    {value}
+                  </Typography>
+                </Stack>
+              ))}
+            </Box>
+          )}
+
           <Stack
             direction={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
@@ -140,7 +232,7 @@ export default function ProductDetails({
                 fontSize: 33,
               }}
             >
-              ฿{product.price}
+              ฿{formatPrice(displayPrice)}
             </Typography>
             <Stack
               direction={{ xs: "column", sm: "row" }}
@@ -148,7 +240,7 @@ export default function ProductDetails({
               sx={{ width: { xs: "100%", sm: "auto" } }}
             >
               <Button
-                onClick={() => onAdd(product)}
+                onClick={() => onAdd(displayItem)}
                 variant="outlined"
                 sx={{
                   borderColor: "#183b2a",
@@ -160,7 +252,7 @@ export default function ProductDetails({
                 เพิ่มตะกร้า
               </Button>
               <Button
-                onClick={() => onBuyNow(product)}
+                onClick={() => onBuyNow(displayItem)}
                 variant="contained"
                 disableElevation
                 sx={{
@@ -174,7 +266,7 @@ export default function ProductDetails({
               </Button>
             </Stack>
           </Stack>
-          {recommendation && (
+          {recommendation && !isPackage && !isTool && (
             <Box
               sx={{
                 mt: 4,
