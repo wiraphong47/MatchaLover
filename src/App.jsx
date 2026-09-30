@@ -56,7 +56,21 @@ export default function App() {
         /^\/+/,
         ""
       );
-      if (!action) return;
+      if (!action) {
+        setSelectedProduct(null);
+        setPage("home");
+        return;
+      }
+      const productMatch = action.match(/^product\/([^/]+)$/);
+      if (productMatch) {
+        const product = products.find((item) => item.id === productMatch[1]);
+        if (product) {
+          setSelectedProduct(product);
+          setPage("product-detail");
+          window.scrollTo({ top: 0, behavior: "auto" });
+          return;
+        }
+      }
       setSelectedProduct(null);
       const route = {
         shop: "shop",
@@ -133,6 +147,8 @@ export default function App() {
     } else goTo("login");
   };
   const openProduct = (product) => {
+    const baseUrl = `${window.location.pathname}${window.location.search}`;
+    window.history.pushState(null, "", `${baseUrl}#/product/${product.id}`);
     setSelectedProduct(product);
     setPage("product-detail");
     window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 0);
@@ -243,7 +259,7 @@ export default function App() {
       return (
         <ProductDetailPage
           product={selectedProduct}
-          onBack={() => scrollToSection("products")}
+          onBack={() => goTo("shop")}
           onAdd={addToCart}
           onBuyNow={buyNow}
           recommendation={products.find(
